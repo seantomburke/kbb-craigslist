@@ -1,0 +1,47 @@
+{
+  "name": "Kelley Blue Book for Craigslist",
+  "version": "0.0.1",
+  "manifest_version": 2,
+  "description": "Use Kelley Blue Book to find the real value of cars",
+  "homepage_url": "http://extensionizr.com",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "default_locale": "en",
+  "background": {
+    "scripts": [
+      "src/bg/require.js",
+      "src/bg/jquery.js",
+      "src/inject/inject.js",
+      "src/bg/background.js"
+    ],
+    "persistent": true
+  },
+  "options_page": "src/options_custom/index.html",
+  "permissions": [
+    "tabs",
+    "geolocation",
+    "*://*.kbb.com/*",
+    "*://*.craigslist.org/ct*/*.html"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.craigslist.org/ct*/*.html"
+      ],
+      "css": [
+        "src/inject/inject.css"
+      ]
+    },
+    {
+      "matches": [
+        "*://*.craigslist.org/ct*/*.html"
+      ],
+      "js": [
+        "src/inject/inject.js"
+      ]
+    }
+  ]
+}
