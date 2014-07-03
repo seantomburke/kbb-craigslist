@@ -91,7 +91,8 @@ $.ajax({
 	  		addKbb(form);
 	  },
       success: function(data, responseText, jqXHR){
-      		var extracted = $($.parseHTML(data)).find("#Styles-list-container");
+      		var extracted = $($.parseHTML(data)).find(".trade-sell");
+      		extracted.find("aside").remove();
 			$.each(extracted.find("a"), function(i,el){
 				var e = $(el);
 				var url = "http://www.kbb.com" + e.attr("href");
