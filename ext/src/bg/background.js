@@ -12,8 +12,9 @@ chrome.extension.onMessage.addListener(
     sendResponse();
   });
 
+$("head").prepend($("<base>").attr("href","http://www.kbb.com/"));
 $("body").append($("<div>").attr("id","kbb").load(
-	"http://www.kbb.com/toyota/corolla/1996-toyota-corolla .mod-gradiated-content", 
+	"http://www.kbb.com/toyota/corolla/1996-toyota-corolla/styles/?intent=buy-used&mileage=165000 .mod-gradiated-content", 
 	{
 		miles: 100, 
 		type: "toyota"

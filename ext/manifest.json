@@ -12,12 +12,9 @@
   "default_locale": "en",
   "background": {
     "scripts": [
-      "src/bg/require.js",
-      "src/bg/jquery.js",
-      "src/inject/inject.js",
       "src/bg/background.js"
     ],
-    "persistent": true
+    "persistent": false
   },
   "options_page": "src/options_custom/index.html",
   "permissions": [
@@ -40,6 +37,8 @@
         "*://*.craigslist.org/ct*/*.html"
       ],
       "js": [
+        "src/inject/jquery-1.11.0.min.js",
+        "src/inject/jquery-migrate-1.2.1.min.js",
         "src/inject/inject.js"
       ]
     }
