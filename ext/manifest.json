@@ -12,9 +12,11 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "src/inject/jquery-1.11.0.min.js",
+      "src/inject/jquery-migrate-1.2.1.min.js",
       "src/bg/background.js"
     ],
-    "persistent": false
+    "persistent": true
   },
   "options_page": "src/options_custom/index.html",
   "permissions": [

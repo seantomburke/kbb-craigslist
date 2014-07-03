@@ -6,20 +6,83 @@
 
 
 //example of using a message handler from the inject scripts
-chrome.extension.onMessage.addListener(
-  function(request, sender, sendResponse) {
-  	chrome.pageAction.show(sender.tab.id);
-    sendResponse();
-  });
+chrome.runtime.onConnect.addListener(function(port) {
+	console.assert(port.name == "kbb-port");
+	console.log(port);
+	port.onMessage.addListener(function(request) {
+		if(request.type == "test")
+		{
+			console.log("Connected!");
+		}
+		if(request.type == "categories")
+		{
+			$.ajax({
+			  url: request.url,
+			  dataType: "html",
+			  type: "GET",
+			  data: request.kbb_data,
+			  error: function(jqXHR, textStatus, errorThrown){
+			  		console.log("error");
+					sendResponse({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+			  },
+			  success: function(data, responseText, jqXHR){
+			  		console.log(data);
+			  		//url = "http://www.kbb.com" + $(data).find("#GetMyPrice").attr("href");
+			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:data});
+			  }
+			});
+		}
+		if(request.type == "styles"){
+			$.ajax({
+			  url: request.url,
+			  dataType: "html",
+			  type: "GET",
+			  data: request.kbb_data,
+			  error: function(jqXHR, textStatus, errorThrown){
+			  		console.log("error");
+					sendResponse({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+			  },
+			  success: function(data, responseText, jqXHR){
+			  		console.log(data);
+			  		//url = "http://www.kbb.com" + $(data).find("#GetMyPrice").attr("href");
+			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:data});
+			  }
+			});
+		}
+		if(request.type == "options"){
+			$.ajax({
+			  url: request.url,
+			  dataType: "html",
+			  type: "GET",
+			  data: request.kbb_data,
+			  error: function(jqXHR, textStatus, errorThrown){
+			  		console.log("error");
+					sendResponse({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+			  },
+			  success: function(data, responseText, jqXHR){
+			  		console.log(data);
+			  		//url = "http://www.kbb.com" + $(data).find("#GetMyPrice").attr("href");
+			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:data});
+			  }
+			});
+		}
+	});
+});
 
-$("head").prepend($("<base>").attr("href","http://www.kbb.com/"));
-$("body").append($("<div>").attr("id","kbb").load(
-	"http://www.kbb.com/toyota/corolla/1996-toyota-corolla/styles/?intent=buy-used&mileage=165000 .mod-gradiated-content", 
-	{
-		miles: 100, 
-		type: "toyota"
-	}, 
-	function(){
-		console.log("Sean is Awesome");
-		chrome.extension.sendMessage("Sean", "is Awesome");
-}));
+function ajax(url, data, port){
+	$.ajax({
+			  url: url,
+			  dataType: "html",
+			  type: "GET",
+			  data: data,
+			  error: function(jqXHR, textStatus, errorThrown){
+			  		console.log("error");
+					sendResponse({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+			  },
+			  success: function(data, responseText, jqXHR){
+			  		console.log(data);
+			  		//url = "http://www.kbb.com" + $(data).find("#GetMyPrice").attr("href");
+			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:data});
+			  }
+	});
+}
