@@ -91,13 +91,14 @@ $.ajax({
 	  		addKbb(form);
 	  },
       success: function(data, responseText, jqXHR){
-      		var extracted = $($.parseHTML(data)).find(".trade-sell");
+      		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
       		extracted.find("aside").remove();
 			$.each(extracted.find("a"), function(i,el){
 				var e = $(el);
 				var url = "http://www.kbb.com" + e.attr("href");
-				e.attr("href","#");
-				e.attr("onclick", "getNext(event, '"+url+"');");
+				e.attr("href",url);
+				e.attr("target","_BLANK");
+				//e.attr("onclick", "getNext(event, '"+url+"');");
 				e.on('click', function(e){
 					console.log(e);
 					e.preventDefault();
