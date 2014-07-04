@@ -6,7 +6,6 @@
 
 
 //example of using a message handler from the inject scripts
-$("<div>", {id:"kbb-iframe"}).appendTo("body");
 
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");
@@ -45,6 +44,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 					});
 			  		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});
 			  		handleClick(port);
+
+			   		$("body").html(data);
 			  }
 			});
 		}
@@ -75,6 +76,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 					});
 					port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});	
 					handleClick(port);
+
+			   		$("body").html(data);
 			  }
 			});
 		}
@@ -103,44 +106,29 @@ chrome.runtime.onConnect.addListener(function(port) {
 					handleClick(port);
 			  		url = $(extracted).find("#GetMyPrice").attr("href");
 			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});
+
+			   		$("body").html(data);
 			  }
 			});
 		}
 		if(request.type == "default"){
 			console.log("starting default script");
-			iframe = $('<iframe>',{src: request.url,name:"price",id:"price", width:"500px",height:"1000px"});
-			$("#kbb-iframe").html(iframe);
-			$(document).ready(function(){
-				console.log(document);
-				port.postMessage({kbb_data:request.kbb_data, data:$(document).find("body").html(), type:request.type});
-			});
-			console.log(iframe);
 
-			// $.ajax({
-			//   url: request.url,
-			//   dataType: "html",
-			//   type: "GET",
-			//   data: request.kbb_data,
-			//   error: function(jqXHR, textStatus, errorThrown){
-			//   		console.log("error");
-			// 		port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
-			//   },
-			//   success: function(data, responseText, jqXHR){
-			//   		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-		 //      		extracted.find("aside").remove();
-		 //      		//if(extracted.find(".selected"))
-		 //      		//extracted.find(".mod-category").not(".selected").remove();
-			// 		$.each(extracted.find("a"), function(i,el){
-			// 			var e = $(el);
-			// 			e.attr("target","_BLANK");
-			// 			e.attr("onclick", "");
-			// 			e.addClass("kbb-link");
-			// 			e.attr("href", "http://www.kbb.com" + e.attr("href"));
-			// 		});
-			// 		handleClick(port);
-			//   		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html()});
-			//   }
-			// });
+			 $.ajax({
+			   url: request.url,
+			   dataType: "html",
+			   type: "GET",
+			   data: request.kbb_data,
+			   error: function(jqXHR, textStatus, errorThrown){
+			   		console.log("error");
+			 		port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
+			   },
+			   success: function(data, responseText, jqXHR){
+			   		console.log($("body"));
+			   		$("body").html(data);
+			   		port.postMessage({kbb_data:request.kbb_data, data:data, type:request.type});
+			  }
+			});
 		}
 		if(request.type == "condition"){
 			console.log("starting condition script");
@@ -167,6 +155,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 					});
 					handleClick(port);
 			  		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});
+			   		$("body").html(data);
 			  }
 			});
 		}
