@@ -38,39 +38,17 @@ var addKbb = function(html){
 	kbb.append(html);
 };
 
-function getNext(e, url){
-	e.preventDefault();
-	$.ajax({
-      url: url,
-      dataType: "html",
-      type: "GET",
-	  error: function(jqXHR, textStatus, errorThrown){
-
-	  		var form = $("<form>").attr("id","kbb-form");
-	  		form.append($("<input>").attr({"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
-	  		form.append($("<input>").attr({"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
-	  		form.append($("<input>").attr({"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
-	  		form.append($("<input>").attr({"id":"kbb-year", "type":"submit", "name":"submit","value":"submit"}));
-
-	  		addKbb(form);
-	  },
-      success: function(data, responseText, jqXHR){
-      		var extracted = $($.parseHTML(data)).find("#GetMyPrice");
-      		$("#kbb").html(extracted.html());
-      }
-    });
-
-}
 kbb_data = {};
 kbb_data['intent'] = "buy-used";
 kbb_data['pricetype'] = "private-party";
-var conv= function(d,c){var m,b;m=(b=kbb_data[d])?(b=carInfo[c]):0};
+conv= function(d,c){var m,b;m=(b=carInfo[c])?(kbb_data[d]=b):0};
 conv('mileage','odometer');
 conv('bodystyle','type');
 conv('condition','condition');
 
-//mx = (m=kbb_data['mileage'])?(m=carInfo["odometer"]):0;
+//kbb_data['mileage'])?(m=carInfo["odometer"]):0;
 //bx = (b=kbb_data['bodystyle'])?(b=carInfo["type"]):0;
+//cx = (b=kbb_data['condition'])?(b=carInfo["condition"]):0;
 //kbb_data['vehicleid'] = carInfo["VIN"];
 //kbb_data['condition'] = carInfo["condition"];
 
@@ -78,7 +56,6 @@ conv('condition','condition');
 var url = ("http://www.kbb.com/"+carInfo["make"]+"/"+carInfo["model"]+"/"+carInfo["year"]+"-"+carInfo["make"]+"-"+carInfo["model"]+"/styles/").replace(/ /g,"-");
 console.log(url + "?" + serialize(kbb_data));
 //$("head").prepend($("<base>").attr("href","http://www.kbb.com/"));
-
 $.ajax({
       url: url,
       dataType: "html",
@@ -102,26 +79,42 @@ $.ajax({
 				e.attr("target","_BLANK");
 				e.attr("onclick", "");
 				e.addClass("kbb-link");
+				e.attr("href", "http://www.kbb.com" + e.attr("href"));
 			});
       		addKbb(extracted.html());
-			$(".kbb-link").on('click', function(e){
-				console.log(e);
-				e.preventDefault();
-				var url = "http://www.kbb.com" + $(this).attr("href");
-				var type = $(this).attr("href").match(/(styles|options|categories)/)[0];
-				console.log(url);
-				console.log(type);
-				port.postMessage({type:type, url: url, kbb_data: kbb_data});
-				port.onMessage.addListener(function(response) {
-					console.log(response);
-					console.log($(response.data));
-					$("#kbb").html($(response.data).find("#GetMyPrice"));
-				console.log("returned");
-				});
-			});
+      		handleClick(port);
       }
     });
 
 console.log("http://www.seantburke.com/");
+
+var handleClick = function(port){
+			$(".kbb-link").on('click', function(e){
+				console.log(e);
+				e.preventDefault();
+				var url = $(this).attr("href");
+				var type = (m=$(this).attr("href").match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
+				console.log(url);
+				console.log(type);
+				port.postMessage({type:type, url: url, kbb_data: kbb_data});
+				port.onMessage.addListener(function(response) {
+					if(response.type == "default"){
+						console.log("DEFAULT TYPE!!");
+						console.log(response);
+						$("#kbb").html($(response.data));
+						handleClick(port);
+					}
+					else
+					{
+						console.log("Type is:" + response.type);
+						console.log(response);
+						$("#kbb").html(response.data);
+						handleClick(port);
+					}
+
+				console.log("returned");
+				});
+			});
+}
 
 
