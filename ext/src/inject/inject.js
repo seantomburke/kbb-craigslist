@@ -103,7 +103,15 @@ var handleClick = function(port){
 						console.log(response);
 						carPriceInfo = "("+(st=(s=response.data).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "").replace(/&quot;/g,"'")+")";
 						d=eval(carPriceInfo);
+						console.log(d);
 						$("#kbb").html($(response.img));
+						$("#kbb").prepend($("<h1>", {
+							id: "carInfo"
+						}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
+						$("#kbb").append($("<h1>", {
+							id: "price"
+						}).html("$" + d.data.values.fpp.price));
+						handleClick(port);
 					}
 					else
 					{
