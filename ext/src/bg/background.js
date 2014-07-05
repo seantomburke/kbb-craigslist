@@ -108,39 +108,40 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		if(request.type == "default"){
 			console.log("starting default script");
-			iframe = $('<iframe>',{src: request.url,name:"price",id:"price", width:"500px",height:"1000px"});
-			$("#kbb-iframe").html(iframe);
-			$(document).ready(function(){
-				console.log(document);
-				port.postMessage({kbb_data:request.kbb_data, data:$(document).find("body").html(), type:request.type});
-			});
-			console.log(iframe);
+			$.ajax({
+			  url: request.url,
+			  dataType: "html",
+			  type: "GET",
+			  data: request.kbb_data,
+			  error: function(jqXHR, textStatus, errorThrown){
+			  		console.log("error");
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+			  },
+			  success: function(data, responseText, jqXHR){
 
-			// $.ajax({
-			//   url: request.url,
-			//   dataType: "html",
-			//   type: "GET",
-			//   data: request.kbb_data,
-			//   error: function(jqXHR, textStatus, errorThrown){
-			//   		console.log("error");
-			// 		port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown});
-			//   },
-			//   success: function(data, responseText, jqXHR){
-			//   		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-		 //      		extracted.find("aside").remove();
-		 //      		//if(extracted.find(".selected"))
-		 //      		//extracted.find(".mod-category").not(".selected").remove();
-			// 		$.each(extracted.find("a"), function(i,el){
-			// 			var e = $(el);
-			// 			e.attr("target","_BLANK");
-			// 			e.attr("onclick", "");
-			// 			e.addClass("kbb-link");
-			// 			e.attr("href", "http://www.kbb.com" + e.attr("href"));
-			// 		});
-			// 		handleClick(port);
-			//   		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html()});
-			//   }
-			// });
+			  		iframe = $('<iframe>',{srcdoc: data,name:"price-iframe",id:"price-iframe", width:"500px",height:"1000px",sandbox:"allow-same-origin allow-scripts allow-top-navigation allow-forms"});
+					$("#kbb-iframe").html(iframe);
+					var extracted = $($.parseHTML(data)).find("#Vehicle-info .pic");
+		      		//extracted.find("aside").remove();
+		      		//if(extracted.find(".selected"))
+		      		//extracted.find(".mod-category").not(".selected").remove();
+					$.each(extracted.find("a"), function(i,el){
+						var e = $(el);
+						e.attr("target","_BLANK");
+						e.attr("onclick", "");
+						e.addClass("kbb-link");
+						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+					});
+
+					$(document).ready(function(){
+						console.log(document);
+						carPriceInfo = 1;//eval("("+(st=(s=$($("#kbb-iframe").contents()[0]).find("script").text()).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "")+")");
+						console.log(carPriceInfo);
+						port.postMessage({kbb_data:request.kbb_data, data:$(document).find("body").html(), img:extracted.html(), type:request.type});
+					});
+					handleClick(port);
+			  }
+			});
 		}
 		if(request.type == "condition"){
 			console.log("starting condition script");
