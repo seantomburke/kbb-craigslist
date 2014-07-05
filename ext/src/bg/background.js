@@ -54,7 +54,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  url: request.url,
 			  dataType: "html",
 			  type: "GET",
-			  data: request.kbb_data,
+			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
@@ -64,6 +64,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
 			  		console.log($(extracted));
 		      		extracted.find("aside").remove();
+		      		extracted.find("*").removeClass("collapse");
 		      		//if(extracted.find(".selected"))
 		      		//extracted.find(".mod-category").not(".selected").remove();
 					$.each(extracted.find("a"), function(i,el){
@@ -168,7 +169,10 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("href", "http://www.kbb.com" + e.attr("href"));
 					});
 					handleClick(port);
-			  		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});
+					var url = $(extracted).find(".btn-main-cta").first().attr("href");
+					console.log("url:" + url);
+					var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
+			  		kbbAJAX({url:url,kbb_data:request.kbb_data, data:$(extracted).html(), type:type});
 			  }
 			});
 		}

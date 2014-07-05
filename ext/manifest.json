@@ -12,8 +12,8 @@
   "default_locale": "en",
   "background": {
     "scripts": [
-      "src/inject/jquery-1.11.0.min.js",
-      "src/inject/jquery-migrate-1.2.1.min.js",
+      "src/inject/js/jquery-1.11.0.min.js",
+      "src/inject/js/jquery-migrate-1.2.1.min.js",
       "src/bg/background.js"
     ],
     "persistent": true
@@ -31,7 +31,9 @@
         "*://*.craigslist.org/ct*/*.html"
       ],
       "css": [
-        "src/inject/inject.css"
+        "src/inject/css/inject.css",
+        "src/inject/css/bootstrap-theme.min.css",
+        "src/inject/css/bootstrap.min.css"
       ]
     },
     {
@@ -39,9 +41,10 @@
         "*://*.craigslist.org/ct*/*.html"
       ],
       "js": [
-        "src/inject/jquery-1.11.0.min.js",
-        "src/inject/jquery-migrate-1.2.1.min.js",
-        "src/inject/inject.js"
+        "src/inject/js/jquery-1.11.0.min.js",
+        "src/inject/js/jquery-migrate-1.2.1.min.js",
+        "src/inject/js/inject.js",
+        "src/inject/js/bootstrap.min.js"
       ]
     }
   ]

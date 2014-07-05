@@ -45,6 +45,10 @@ conv= function(d,c){var m,b;m=(b=carInfo[c])?(kbb_data[d]=b):0};
 conv('mileage','odometer');
 conv('bodystyle','type');
 conv('condition','condition');
+if(typeof(m=kbb_data["mileage"]) != undefined && (m.length <= 3))
+{
+	m *= 1000;
+}
 
 //kbb_data['mileage'])?(m=carInfo["odometer"]):0;
 //bx = (b=kbb_data['bodystyle'])?(b=carInfo["type"]):0;
@@ -72,6 +76,7 @@ $.ajax({
       success: function(data, responseText, jqXHR){
       		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
       		extracted.find("aside").remove();
+      		extracted.find("*").removeClass("collapse");
       		//if(extracted.find(".selected"))
       		//extracted.find(".mod-category").not(".selected").remove();
 			$.each(extracted.find("a"), function(i,el){
@@ -124,7 +129,10 @@ var handleClick = function(port){
 						$("#kbb").append($("<h1>", {
 							id: "pricefair"
 						}).html("Fair: $" + d.data.values.privatepartyfair.price));
-						
+
+						$("#kbb").append($("<div>",{class:"row"}).html(
+							'<div class="col-1-xs">$'+d.data.values.fpp.priceMin+'</div><div class="col-10-xs"><div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="{width:45%;}">$'+d.data.values.fpp.priceMax+'</div></div></div><div class="col-1-xs">$'+d.data.values.fpp.priceMax+'</div>'
+							));			
 						handleClick(port);
 					}
 					else
