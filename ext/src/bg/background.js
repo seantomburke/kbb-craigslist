@@ -6,6 +6,7 @@
 
 
 //example of using a message handler from the inject scripts
+$("<div>", {id:"kbb-iframe"}).appendTo("body");
 
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");

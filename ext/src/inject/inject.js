@@ -99,10 +99,11 @@ var handleClick = function(port){
 				port.postMessage({type:type, url: url, kbb_data: kbb_data});
 				port.onMessage.addListener(function(response) {
 					if(response.type == "default"){
-						console.log("DEFAULT TYPE!!");
+						console.log("This is the Default type");
 						console.log(response);
-						$("#kbb").html($(response.data));
-						handleClick(port);
+						carPriceInfo = "("+(st=(s=response.data).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "").replace(/&quot;/g,"'")+")";
+						d=eval(carPriceInfo);
+						$("#kbb").html($(response.img));
 					}
 					else
 					{
