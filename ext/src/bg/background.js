@@ -11,7 +11,7 @@ $("<div>", {id:"kbb-iframe"}).appendTo("body");
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");
 	console.log(port);
-	port.onMessage.addListener(function(request) {
+	port.onMessage.addListener(function kbbAJAX(request) {
 		console.log(request.type);
 		if(request.type == "test")
 		{
@@ -19,7 +19,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		if(request.type == "categories")
 		{
-			console.log("categores script started");
+			console.log("categories script started");
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",
@@ -102,7 +102,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 					});
 					handleClick(port);
 			  		url = $(extracted).find("#GetMyPrice").attr("href");
-			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});
+			  		var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
+			  		kbbAJAX({url: url, kbb_data:request.kbb_data, data:$(extracted).html(), type:type});
 			  }
 			});
 		}

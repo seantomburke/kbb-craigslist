@@ -32,10 +32,10 @@ serialize = function(obj) {
 
 
 var addKbb = function(html){
-	$(".mapAndAttrs").prepend($("<div>").attr("id","kbb"));
-	kbb = $("#kbb");
-	kbb.append($("<h1>").html("Kelley Blue Book Value"));		
-	kbb.append(html);
+	$(".mapAndAttrs").prepend($("<div>").attr("id","kbb-frame"));
+	$("#kbb-frame").append($("<div>").attr("id","kbb"));
+	$("#kbb-frame").prepend($("<h1>").html("Kelley Blue Book Value"));		
+	$("#kbb").append(html);
 };
 
 kbb_data = {};
@@ -92,6 +92,7 @@ var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
 				console.log(e);
 				e.preventDefault();
+				$("#kbb").prepend("<h1 style='{color:yellow}'>Loading...</h1>");
 				var url = $(this).attr("href");
 				var type = (m=$(this).attr("href").match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 				console.log(url);
@@ -111,6 +112,19 @@ var handleClick = function(port){
 						$("#kbb").append($("<h1>", {
 							id: "price"
 						}).html("$" + d.data.values.fpp.price));
+						$("#kbb").append($("<h1>", {
+							id: "priceexcellent"
+						}).html("Excellent: $" + d.data.values.privatepartyexcellent.price));
+						$("#kbb").append($("<h1>", {
+							id: "pricegood"
+						}).html("Good: $" + d.data.values.privatepartygood.price));
+						$("#kbb").append($("<h1>", {
+							id: "priceverygood"
+						}).html("Very Good: $" + d.data.values.privatepartyverygood.price));
+						$("#kbb").append($("<h1>", {
+							id: "pricefair"
+						}).html("Fair: $" + d.data.values.privatepartyfair.price));
+						
 						handleClick(port);
 					}
 					else
@@ -120,7 +134,7 @@ var handleClick = function(port){
 						$("#kbb").html(response.data);
 						handleClick(port);
 					}
-
+					$("#kbb").slideDown();
 				console.log("returned");
 				});
 			});
