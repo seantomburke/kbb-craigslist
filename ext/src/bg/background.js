@@ -81,6 +81,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		if(request.type == "options"){
 			console.log("starting options script");
+			port.postMessage({type:"status", message:"Selecting Basic Options..."});
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",
@@ -139,7 +140,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 						console.log(document);
 						carPriceInfo = 1;//eval("("+(st=(s=$($("#kbb-iframe").contents()[0]).find("script").text()).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "")+")");
 						console.log(carPriceInfo);
-						port.postMessage({kbb_data:request.kbb_data, data:$(document).find("body").html(), img:extracted.html(), type:request.type});
+						port.postMessage({url:request.url, kbb_data:request.kbb_data, data:$(document).find("body").html(), img:extracted.html(), type:request.type});
 					});
 					handleClick(port);
 			  }
@@ -147,6 +148,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		if(request.type == "condition"){
 			console.log("starting condition script");
+			port.postMessage({type:"status", message:"Selecting Condition of Vehicle..."});
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",

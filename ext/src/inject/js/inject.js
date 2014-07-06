@@ -97,7 +97,7 @@ var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
 				console.log(e);
 				e.preventDefault();
-				$("#kbb").prepend("<h1 style='{color:yellow}'>Loading...</h1>");
+				$("#kbb").html("<h1 style='{color:yellow}'>Loading...</h1>");
 				var url = $(this).attr("href");
 				var type = (m=$(this).attr("href").match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 				console.log(url);
@@ -111,29 +111,43 @@ var handleClick = function(port){
 						d=eval(carPriceInfo);
 						console.log(d);
 						$("#kbb").html($(response.img));
+						$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
 						$("#kbb").prepend($("<h1>", {
 							id: "carInfo"
 						}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
 						$("#kbb").append($("<h1>", {
-							id: "price"
-						}).html("$" + d.data.values.fpp.price));
-						$("#kbb").append($("<h1>", {
-							id: "priceexcellent"
+							id: "price",
+							class: "priceInfo"
+						}).html("Fair Purchase Price: $" + d.data.values.fpp.price));
+						$("#kbb").append($("<h2>", {
+							id: "priceexcellent",
+							class: "priceInfo"
 						}).html("Excellent: $" + d.data.values.privatepartyexcellent.price));
-						$("#kbb").append($("<h1>", {
-							id: "pricegood"
+						$("#kbb").append($("<h2>", {
+							id: "pricegood",
+							class: "priceInfo"
 						}).html("Good: $" + d.data.values.privatepartygood.price));
-						$("#kbb").append($("<h1>", {
-							id: "priceverygood"
+						$("#kbb").append($("<h2>", {
+							id: "priceverygood",
+							class: "priceInfo"
 						}).html("Very Good: $" + d.data.values.privatepartyverygood.price));
-						$("#kbb").append($("<h1>", {
-							id: "pricefair"
+						$("#kbb").append($("<h2>", {
+							id: "pricefair",
+							class: "priceInfo"
 						}).html("Fair: $" + d.data.values.privatepartyfair.price));
 
+						var perc = (d.data.values.fpp.price/d.data.values.fpp.priceMax)*100;
 						$("#kbb").append($("<div>",{class:"row"}).html(
-							'<div class="col-1-xs">$'+d.data.values.fpp.priceMin+'</div><div class="col-10-xs"><div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="{width:45%;}">$'+d.data.values.fpp.priceMax+'</div></div></div><div class="col-1-xs">$'+d.data.values.fpp.priceMax+'</div>'
-							));			
+							'<div class="col-1-xs">$'+d.data.values.fpp.priceMin+'</div><div class="col-10-xs"><div class="progress"><div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="width:'+perc+'%;">$'+d.data.values.fpp.price+'</div></div></div><div class="col-1-xs">$'+d.data.values.fpp.priceMax+'</div>'
+							));		
+
+						$("#kbb").append($("<a>", {href:response.url,class:"btn btn-success", target: "_BLANK"}).html("Open in KBB.com"));	
 						handleClick(port);
+					}
+					else if(response.type == "status")
+					{
+						console.log(response.message)
+						$("#kbb").append($("<h1>").html(response.message));
 					}
 					else
 					{
