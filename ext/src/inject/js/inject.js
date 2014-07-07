@@ -5,7 +5,16 @@ port.postMessage({type:"test",connection: "Connected!"});
 // 		console.log($(e));
 // });
 
-listPrice = (p=$(".postingtitle").text().match(/(\$)[\w\,]+/)[0].replace(/k/,"000")).substring(1,p.length);
+// if(l=$(".postingtitle").text().match(/\$([\d,]+)/))
+// {
+// 	listPrice=l[1].replace(/k/,"000")
+// }
+// else
+// {
+// 	listPrice=0;
+// }
+
+listPrice = (l=$(".postingtitle").text().match(/\$([\d,]+)/))?l[1].replace(/k/,"000"):0;
 
 carInfo = {};
 $.each($(".mapAndAttrs p.attrgroup span"), function(i,el){
@@ -50,11 +59,8 @@ conv= function(d,c){var m,b;m=(b=carInfo[c])?(kbb_data[d]=b):0};
 conv('mileage','odometer');
 conv('bodystyle','type');
 conv('condition','condition');
+kbb_data["mileage"]=((n=kbb_data["mileage"]) && n.length <= 3)? (n*1000):n;
 console.log(kbb_data["mileage"]);
-if(kbb_data["mileage"]!=null && (kbb_data["mileage"].length <= 3))
-{
-	kbb_data["mileage"] *= 1000;
-}
 
 //kbb_data['mileage'])?(m=carInfo["odometer"]):0;
 //bx = (b=kbb_data['bodystyle'])?(b=carInfo["type"]):0;
@@ -77,11 +83,12 @@ $.ajax({
 	  			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
 	  		}
 	  		else{
-	  		var form = $("<form>").attr("id","kbb-form");
-	  		form.append($("<input>").attr({"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
-	  		form.append($("<input>").attr({"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
-	  		form.append($("<input>").attr({"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
-	  		form.append($("<input>").attr({"id":"kbb-year", "type":"submit", "name":"submit","value":"submit"}));
+	  		var form = $("<form>",{id:"kbb-form"});
+	  		form.append($("<input>",{"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
+	  		form.append($("<input>",{"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
+	  		form.append($("<input>",{"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
+	  		form.append($("<input>",{"id":"kbb-year", "type":"text", "name":"year","value":carInfo["mileage"]}));
+	  		form.append($("<input>",{"id":"kbb-submit", "type":"submit", "name":"submit","value":"submit"}));
 	  		$("#kbb").hide().html(form).fadeIn("slow");
 	  		}
 	  },
