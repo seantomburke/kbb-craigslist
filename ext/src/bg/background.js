@@ -12,6 +12,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");
 	console.log(port);
 	port.onMessage.addListener(function kbbAJAX(request) {
+		console.log(request.url);
 		console.log(request.type);
 		if(request.type == "test")
 		{
@@ -81,12 +82,12 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		if(request.type == "options"){
 			console.log("starting options script");
-			port.postMessage({type:"status", message:"Selecting Basic Options..."});
+			port.postMessage({kbb_data: request.kbb_data, type:"status", message:"Selecting Basic Options...", url:request.url});
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",
 			  type: "GET",
-			  data: request.kbb_data,
+			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
@@ -148,7 +149,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		if(request.type == "condition"){
 			console.log("starting condition script");
-			port.postMessage({type:"status", message:"Selecting Condition of Vehicle..."});
+			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
+			request.kbb_data["pricetype"] = pricetype;
+			port.postMessage({kbb_data: request.kbb_data, type:"status", message:"Selecting Condition of Vehicle...", url:request.url});
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",

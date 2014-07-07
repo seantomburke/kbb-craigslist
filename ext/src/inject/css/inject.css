@@ -2,7 +2,7 @@
  * Place your custom CSS styles here.
  **/
 
-#kbb{
+#kbb-frame{
 	border-color: #1e3b6f;
 	border-width: 2px;
 	border-style: solid;
@@ -18,9 +18,14 @@
 	color: #222222;
 }
 
-#kbb h1{
+#kbb-frame h1{
 	font-size: 25px;
 	color: #1e3b6f;
+}
+
+h1#kbb-frame{
+	font-weight: bold;
+	font-size: 32px;
 }
 
 .selected {
