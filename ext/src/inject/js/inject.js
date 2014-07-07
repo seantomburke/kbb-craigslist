@@ -18,7 +18,8 @@ $.each($(".mapAndAttrs p.attrgroup span"), function(i,el){
 			carInfo["car"] = e[0];
 			carInfo["year"] = e[0].match(/(19|20)[0-9]{2}/)[0];
 			carInfo["make"] = ((b = e[0].match(/(Acura|Alfa Romeo|Aston Martin|Audi|Bentley|BMW|Buick|Cadillac|Chevrolet|Chrysler|Daewoo|Dodge|Eagle|Ferrari|FIAT|Fisker|Ford|Geo|GMC|Honda|HUMMER|Hyundai|Infinit(i|y)|Isuzu|Jaguar|Jeep|Kia|Lamborghini|Land Rover|Lexus|Lincoln|Lotus|Maserati|Maybach|Mazda|McLaren|Mercedes((-| )Benz)?|Mercury|MINI|Mitsubishi|Nissan|Oldsmobile|Panoz|Plymouth|Pontiac|Porsche|Ram|Rolls-Royce|Saab|Saturn|Scion|smart|SRT|Subaru|Suzuki|Tesla|Toyota|Volkswagen|Volvo)/i)) != null) ? b[0]:null;
-			carInfo["model"] = e[0].replace(carInfo["year"], "").replace(carInfo["make"],"").trim().split(" ")[0];
+			var year = new RegExp(carInfo["year"],"g");
+			carInfo["model"] = e[0].replace(year, "").replace(carInfo["make"],"").trim().split(" ")[0];
 			console.log("carInfo['car'] = "+e[0].trim());
 		}
 });
@@ -71,12 +72,18 @@ $.ajax({
       type: "GET",
       data: kbb_data,
 	  error: function(jqXHR, textStatus, errorThrown){
+	  		if(carInfo["year"] < 1994)
+	  		{
+	  			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
+	  		}
+	  		else{
 	  		var form = $("<form>").attr("id","kbb-form");
 	  		form.append($("<input>").attr({"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
 	  		form.append($("<input>").attr({"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
 	  		form.append($("<input>").attr({"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
 	  		form.append($("<input>").attr({"id":"kbb-year", "type":"submit", "name":"submit","value":"submit"}));
 	  		$("#kbb").hide().html(form).fadeIn("slow");
+	  		}
 	  },
       success: function(data, responseText, jqXHR){
       		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
