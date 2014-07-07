@@ -179,7 +179,6 @@ var handleClick = function(port){
 					{
 						console.log(response.message);
 						console.log(response.kbb_data);
-						console.log(response.message);
 						$("#kbb").append($("<h1>").hide().html(response.message).fadeIn(5000));
 					}
 					else
