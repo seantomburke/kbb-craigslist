@@ -201,4 +201,9 @@ var handleClick = function(port){
 			});
 }
 
+var handleForm = function(port){
+	$("#kbb-form").on('submit', function(){
+		var url = "http://www.kbb.com/";
+	})
+}
 
