@@ -12,16 +12,19 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com; object-src 'self'",
+  "content_security_policy": "script-src 'self' https://ssl.google-analytics.com 'unsafe-eval'; object-src 'self'",
   "default_locale": "en",
+  "browser_action" : {
+    "default_icon" : "icons/icon128.png",
+    "default_popup" : "src/popup/popup.html"
+    },
   "background": {
     "scripts": [
       "src/bg/libs/require/require.js",
       "src/bg/libs/backbone/backbone.js",
       "src/bg/models/KBB.js",
-      "src/inject/js/jquery-1.11.0.min.js",
-      "src/inject/js/jquery-migrate-1.2.1.min.js",
-      "src/bg/app.js",
+      "src/bg/libs/jquery/jquery-1.11.0.min.js",
+      "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
       "src/bg/main.js"
     ],
     "persistent": true
@@ -49,10 +52,10 @@
         "*://*.craigslist.org/ct*/*.html"
       ],
       "js": [
-        "src/inject/js/jquery-1.11.0.min.js",
-        "src/inject/js/jquery-migrate-1.2.1.min.js",
+        "src/bg/libs/jquery/jquery-1.11.0.min.js",
+        "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
         "src/inject/js/inject.js",
-        "src/inject/js/bootstrap.min.js"
+        "src/bg/libs/bootstrap/bootstrap.min.js"
       ]
     }
   ]
