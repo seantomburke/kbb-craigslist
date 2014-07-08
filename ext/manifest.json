@@ -16,6 +16,9 @@
   "default_locale": "en",
   "background": {
     "scripts": [
+      "src/bg/require.js",
+      "src/bg/backbone.js",
+      "src/bg/KBB.js",
       "src/inject/js/jquery-1.11.0.min.js",
       "src/inject/js/jquery-migrate-1.2.1.min.js",
       "src/bg/background.js"
@@ -45,6 +48,8 @@
         "*://*.craigslist.org/ct*/*.html"
       ],
       "js": [
+        "src/bg/require.js",
+        "src/bg/backbone.js",
         "src/inject/js/jquery-1.11.0.min.js",
         "src/inject/js/jquery-migrate-1.2.1.min.js",
         "src/inject/js/inject.js",
