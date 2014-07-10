@@ -7,6 +7,7 @@
 
 //example of using a message handler from the inject scripts
 $("<div>", {id:"kbb-iframe"}).appendTo("body");
+cars = {};
 
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");
@@ -14,6 +15,10 @@ chrome.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function kbbAJAX(request) {
 		console.log(request.url);
 		console.log(request.type);
+		if(request.type == "popup")
+		{
+			port.postMessage({cars:cars, type:"popup"});
+		}
 		if(request.type == "test")
 		{
 			console.log("Connected!");
@@ -122,7 +127,6 @@ chrome.runtime.onConnect.addListener(function(port) {
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
 			  },
 			  success: function(data, responseText, jqXHR){
-
 			  		iframe = $('<iframe>',{srcdoc: data,name:"price-iframe",id:"price-iframe", width:"500px",height:"1000px",sandbox:"allow-same-origin allow-scripts allow-top-navigation allow-forms"});
 					$("#kbb-iframe").html(iframe);
 					var extracted = $($.parseHTML(data)).find("#Vehicle-info .pic");
@@ -143,6 +147,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 						console.log(carPriceInfo);
 						port.postMessage({url:request.url, kbb_data:request.kbb_data, data:$(document).find("body").html(), img:extracted.html(), type:request.type});
 					});
+					cars.push({info:request.kbb_data, price:carPriceInfo});
 					handleClick(port);
 			  }
 			});

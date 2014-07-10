@@ -6,23 +6,23 @@
     <link rel="stylesheet" href="/css/screen.css">
 </head>
 <body>
-<div id="books">
-    <div class="bookContainer">
+<div id="cars">
+    <div class="carContainer">
         <img src="/src/inject/img/ajax-loader.gif"/>
         <ul>
-            <li>Title</li>
-            <li>Author</li>
-            <li>Release date</li>
-            <li>Keywords</li>
+            <li>Make</li>
+            <li>Model</li>
+            <li>Year</li>
+            <li>Mileage</li>
         </ul>
     </div>
-    <script id="bookTemplate" type="text/template">
+    <script id="carTemplate" type="text/template"> 
         <img src="<%= coverImage %>"/>
         <ul>
-            <li><%= title %></li>
-            <li><%= author %></li>
-            <li><%= releaseDate %></li>
-            <li><%= keywords %></li>
+            <li><%= make %></li>
+            <li><%= model %></li>
+            <li><%= year %></li>
+            <li><%= mileage %></li>
         </ul>
     </script>
     
