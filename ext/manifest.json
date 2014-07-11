@@ -54,8 +54,9 @@
       "js": [
         "src/bg/libs/jquery/jquery-1.11.0.min.js",
         "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
-        "src/inject/js/inject.js",
-        "src/bg/libs/bootstrap/bootstrap.min.js"
+        "src/bg/libs/bootstrap/bootstrap.min.js",
+        "src/bg/libs/d3/d3.js",
+        "src/inject/js/inject.js"
       ]
     }
   ]
