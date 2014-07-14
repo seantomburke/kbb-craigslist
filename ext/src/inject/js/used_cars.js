@@ -1,4 +1,5 @@
-['Acura','Alfa Romeo',
+['Acura',
+'Alfa Romeo',
 'Aston Martin',
 'Audi',
 'Bentley',

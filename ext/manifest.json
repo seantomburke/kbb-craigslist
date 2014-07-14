@@ -39,7 +39,8 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.craigslist.org/ct*/*.html"
+        "*://*.craigslist.org/ct*/*.html",
+        "*://*.craigslist.org/*/ct*/*.html"
       ],
       "css": [
         "src/inject/css/inject.css",
@@ -49,7 +50,8 @@
     },
     {
       "matches": [
-        "*://*.craigslist.org/ct*/*.html"
+        "*://*.craigslist.org/ct*/*.html",
+        "*://*.craigslist.org/*/ct*/*.html"
       ],
       "js": [
         "src/bg/libs/jquery/jquery-1.11.0.min.js",
