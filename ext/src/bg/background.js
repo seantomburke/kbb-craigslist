@@ -15,6 +15,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function kbbAJAX(request) {
 		console.log(request.url);
 		console.log(request.type);
+		request.url = request.url.replace(/intent=buy-new/g, 'intent=buy-used');
 		if(request.type == "popup")
 		{
 			port.postMessage({cars:cars, type:"popup"});
@@ -33,7 +34,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
+						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log("categories sucess!");
@@ -63,7 +65,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
+						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log("Styles Success!");
@@ -95,7 +98,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log("options success!");
@@ -124,7 +127,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
+						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		iframe = $('<iframe>',{srcdoc: data,name:"price-iframe",id:"price-iframe", width:"500px",height:"1000px",sandbox:"allow-same-origin allow-scripts allow-top-navigation allow-forms"});
@@ -164,7 +168,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
+						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
@@ -197,7 +202,8 @@ function ajax(url, data, port){
 			  data: data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
+						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log(data);
