@@ -212,6 +212,21 @@ var handleResponse = function(response) {
 						carPriceInfo = "("+(st=(s=response.data).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "").replace(/&quot;/g,"'")+")";
 						d=eval(carPriceInfo);
 						console.log(d);
+
+
+						kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
+
+						if(kbb_price[carInfo['condition']]){
+							current_price = kbb_price[carInfo['condition']];
+							console.log(current_price);
+							console.log("kbb_price['"+carInfo['condition']+"']");
+							priceLabel = "Price for "+ carInfo['condition'] +" Condition: $" + current_price;
+						}
+						else{
+							current_price = d.data.values.fpp.price;
+							priceLabel = "Fair Purchase Price: $" + current_price;
+						}
+
 						$("#kbb").hide().html($(response.img)).fadeIn("slow");
 						$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
 						$("#kbb").prepend($("<h1>", {
@@ -220,31 +235,33 @@ var handleResponse = function(response) {
 						$("#kbb").append($("<h1>", {
 							id: "price",
 							class: "priceInfo"
-						}).html("Fair Purchase Price: $" + d.data.values.fpp.price).hide().fadeIn("slow"));
-						var priceLabel;
-						if(listPrice > d.data.values.fpp.price)
+						}).html(priceLabel).hide().fadeIn("slow"));
+						var priceDiffLabel;
+
+						if(listPrice > current_price)
 						{
-							priceLabel = "<h1 style='color:red'>$"+ listPrice +"</label><small><span style='color:red;' class='glyphicon glyphicon-arrow-up'></span>$"+ (listPrice - d.data.values.fpp.price) +"</small></h1>";
+							priceDiffLabel = "<h1 style='color:red'>$"+ listPrice +"</label><small><span style='color:red;' class='glyphicon glyphicon-arrow-up'></span>$"+ (listPrice - current_price) +"</small></h1>";
 						}
 						else{
-							priceLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (d.data.values.fpp.price - listPrice) +"</small></h1>";
+							priceDiffLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (current_price - listPrice) +"</small></h1>";
 						}
 						$("#kbb").append($("<h1>", {
 							id: "price",
 							class: "priceInfo"
-						}).html(priceLabel).hide().fadeIn("slow"));
+						}).html(priceDiffLabel).hide().fadeIn("slow"));
+
 						$("#kbb").append($("<h2>", {
 							id: "priceexcellent",
 							class: "priceInfo"
 						}).html("Excellent: $" + d.data.values.privatepartyexcellent.price).hide().fadeIn("slow"));
 						$("#kbb").append($("<h2>", {
-							id: "pricegood",
-							class: "priceInfo"
-						}).html("Good: $" + d.data.values.privatepartygood.price).hide().fadeIn("slow"));
-						$("#kbb").append($("<h2>", {
 							id: "priceverygood",
 							class: "priceInfo"
 						}).html("Very Good: $" + d.data.values.privatepartyverygood.price).hide().fadeIn("slow"));
+						$("#kbb").append($("<h2>", {
+							id: "pricegood",
+							class: "priceInfo"
+						}).html("Good: $" + d.data.values.privatepartygood.price).hide().fadeIn("slow"));
 						$("#kbb").append($("<h2>", {
 							id: "pricefair",
 							class: "priceInfo"
