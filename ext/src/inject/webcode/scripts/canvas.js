@@ -41,15 +41,25 @@ function dot(context, degrees, radius, w, h){
     var y = radius*Math.sin(toRadians(degrees+180));
     console.log({x:x,y:y, degrees: degrees, radius:radius});
 
-    context.translate(0, 0);
+    context.translate(x, y);
     context.scale(w/2, h/2);
     context.arc(1, 1, 1, 0, 2*Math.PI, false);
     context.closePath();
     context.restore();
 }
 
-function drawCanvas(canvasId, data)
+function drawCanvas(canvasId, input)
 {
+    var fairprice = input.kbb.data.values.privatepartyfair.price;
+    var goodprice = input.kbb.data.values.privatepartygood.price;
+    var verygoodprice = input.kbb.data.values.privatepartyverygood.price;
+    var excellentprice = input.kbb.data.values.privatepartyexcellent.price;
+    var scaleLow = Math.floor(input.kbb.data.scale.scaleLow * .85);
+    var scaleHigh = Math.floor(input.kbb.data.scale.scaleHigh);
+    var listPrice = input.listPrice;
+
+    var kbbStartAngle = (((fairprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;
+    var kbbEndAngle = (((excellentprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;
     //// General Declarations
     var canvas = document.getElementById(canvasId);
     var context = canvas.getContext('2d');
@@ -63,6 +73,7 @@ function drawCanvas(canvasId, data)
     var goodPriceColor = 'rgba(27, 160, 0, 0.86)';
     var bad = 'rgba(195, 24, 21, 1)';
     var color = 'rgba(255, 255, 255, 1)';
+    var currentPriceColor = 'rgba(29, 52, 255, 1)';
 
     //// Shadow Declarations
     function shadow(context)
@@ -82,49 +93,36 @@ function drawCanvas(canvasId, data)
 
     //// Image Declarations
     var logo240 = new Image();
-    logo240.src = chrome.extension.getURL('/src/inject/webcode/images/logo240.png');
-
-    //// Frames
-    var frame = makeRect(10, 20, 240, 200);
-
-    var fairprice = data.data.values.privatepartyfair.price;
-    var goodprice = data.data.values.privatepartygood.price;
-    var verygoodprice = data.data.values.privatepartyverygood.price;
-    var excellentprice = data.data.values.privatepartyexcellent.price;
-    var scaleLow = Math.floor(data.data.scale.scaleLow * .85);
-    var scaleHigh = Math.floor(data.data.scale.scaleHigh);
-
+    logo240.src = 'images/logo240.png';
 
     //// Abstracted Attributes
-    var kbbStartAngle = (((fairprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;
-    var kbbEndAngle = (((excellentprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;
-    console.log(data);
-    console.log(fairprice);
-    console.log(scaleLow);
-    console.log(scaleHigh);
-    console.log(excellentprice);
-    console.log(kbbStartAngle);
-    console.log(kbbEndAngle);
+    var redSemiCircleStartAngle = 315;
+    var greySemiCircleEndAngle = 315;
+    var greenSemiCircleStartAngle = 225;
+    var greenSemiCircleEndAngle = 315;
+    var privatePartyRangeContent = 'PRIVATE PARTY RANGE';
+    var excellentPriceRect = makeRect(188, 70, 44, 17);
+    var fairPriceRect = makeRect(27, 68, 48, 17);
+    var goodPriceRect = makeRect(67, 44, 48, 17);
+    var veryGoodPriceRect = makeRect(111, 37, 48, 17);
+    var currentPriceRect = makeRect(146, 46, 48, 17);
 
     var redSemiCircleStartAngle = kbbEndAngle;
     var greySemiCircleEndAngle = redSemiCircleStartAngle;
     var greenSemiCircleStartAngle = kbbStartAngle;
     var greenSemiCircleEndAngle = redSemiCircleStartAngle;
-    var textContent = 'PRIVATE PARTY RANGE';
+
     var minPriceContent = "$" + scaleLow;
     var maxPriceContent = '$'+ scaleHigh;
-    var excellentPriceRect = makeRect(frame.x + Math.floor((frame.w - 44) * 0.97881 + 0.5), frame.y + Math.floor((frame.h - 17) * 0.17734 + 0.5), 44, 17);
     var excellentPriceContent = '$' + excellentprice;
-    var fairPriceRect = makeRect(frame.x + Math.floor((frame.w - 48) * 0.02586 + 0.5), frame.y + Math.floor((frame.h - 17) * 0.17734 + 0.5), 48, 17);
     var fairPriceContent = '$'+fairprice;
-    var goodPriceRect = makeRect(frame.x + Math.floor((frame.w - 48) * 0.30172 + 0.5), frame.y + Math.floor((frame.h - 17) * 0.02956 + 0.5), 48, 17);
     var goodPriceContent = '$'+ goodprice;
-    var veryGoodPriceRect = makeRect(frame.x + Math.floor((frame.w - 48) * 0.71552 + 0.5), frame.y + Math.floor((frame.h - 17) * 0.02956 + 0.5), 48, 17);
     var veryGoodPriceContent = '$'+verygoodprice;
+    var currentPriceContent = '$'+listPrice;
 
 
     //// Red Semi Circle Drawing
-    arc(context, frame.x + Math.floor(frame.w * 0.07336 + 0.5), frame.y + Math.floor(frame.h * 0.20833) + 0.5, Math.floor(frame.w * 0.96525 + 0.5) - Math.floor(frame.w * 0.07336 + 0.5), Math.floor(frame.h * 1.34559) - Math.floor(frame.h * 0.20833), redSemiCircleStartAngle, 0, true);
+    arc(context, 29, 71, 200, 200, redSemiCircleStartAngle, 0, true);
     context.save();
     shadow(context);
     context.fillStyle = bad;
@@ -150,7 +148,7 @@ function drawCanvas(canvasId, data)
 
 
     //// Grey Semi Circle Drawing
-    arc(context, frame.x + Math.floor(frame.w * 0.07336 + 0.5), frame.y + Math.floor(frame.h * 0.20833) + 0.5, Math.floor(frame.w * 0.96525 + 0.5) - Math.floor(frame.w * 0.07336 + 0.5), Math.floor(frame.h * 1.34559) - Math.floor(frame.h * 0.20833), 180, greySemiCircleEndAngle, true);
+    arc(context, 29, 71, 200, 200, 180, greySemiCircleEndAngle, true);
     context.save();
     shadow(context);
     context.fillStyle = grey;
@@ -176,7 +174,7 @@ function drawCanvas(canvasId, data)
 
 
     //// Green SemiCircle Drawing
-    arc(context, frame.x + Math.floor(frame.w * 0.00000 + 0.5), frame.y + Math.floor(frame.h * 0.12010) + 0.5, Math.floor(frame.w * 1.03475 + 0.5) - Math.floor(frame.w * 0.00000 + 0.5), Math.floor(frame.h * 1.43873) - Math.floor(frame.h * 0.12010), greenSemiCircleStartAngle, greenSemiCircleEndAngle, true);
+    arc(context, 19, 61, 220, 220, greenSemiCircleStartAngle, greenSemiCircleEndAngle, true);
     context.save();
     shadow(context);
     context.fillStyle = good;
@@ -202,7 +200,7 @@ function drawCanvas(canvasId, data)
 
 
     //// Good Dot Drawing
-    oval(context, frame.x + Math.floor((frame.w - 10) * 0.38353) + 0.5, frame.y + Math.floor((frame.h - 10) * 0.12629) + 0.5, 10, 10);
+    oval(context, 85.5, 62.5, 10, 10);
     context.save();
     shadow(context);
     context.fillStyle = good;
@@ -231,7 +229,7 @@ function drawCanvas(canvasId, data)
 
 
     //// Fair Dot Drawing
-    dot(context, greenSemiCircleStartAngle, 260/2, 10, 10);
+    oval(context, 46.5, 87.5, 10, 10);
     context.save();
     shadow(context);
     context.fillStyle = good;
@@ -260,7 +258,7 @@ function drawCanvas(canvasId, data)
 
 
     //// Very Good Dot Drawing
-    oval(context, frame.x + Math.floor((frame.w - 10) * 0.66867) + 0.5, frame.y + Math.floor((frame.h - 10) * 0.12629) + 0.5, 10, 10);
+    oval(context, 129.5, 54.5, 10, 10);
     context.save();
     shadow(context);
     context.fillStyle = good;
@@ -288,14 +286,14 @@ function drawCanvas(canvasId, data)
     context.restore();
 
 
-    //// Oval 5 Drawing
-    oval(context, frame.x + Math.floor((frame.w - 10) * 0.88554) + 0.5, frame.y + Math.floor((frame.h - 10) * 0.28093) + 0.5, 10, 10);
+    //// Excellent Dot Drawing
+    oval(context, 204.5, 87.5, 10, 10);
     context.save();
     shadow(context);
     context.fillStyle = good;
     context.fill();
 
-    ////// Oval 5 Inner Shadow
+    ////// Excellent Dot Inner Shadow
     context.save();
     context.clip();
     context.moveTo(-10000, -10000);
@@ -317,26 +315,25 @@ function drawCanvas(canvasId, data)
     context.restore();
 
 
-    //// Text Drawing
-    var textRect = makeRect(frame.x + Math.floor((frame.w - 94) * 0.50303 + 0.5), frame.y + Math.floor((frame.h - 10) * 0.29897 + 0.5), 94, 10);
+    //// Private Party Range Drawing
+    var privatePartyRangeRect = makeRect(79, 100, 94, 10);
     context.fillStyle = whiteColor;
     context.font = '9px Tahoma, Verdana, Segoe, sans-serif';
     context.textAlign = 'center';
-    context.fillText(textContent, textRect.x + textRect.w/2, textRect.y + 9);
+    context.fillText(privatePartyRangeContent, privatePartyRangeRect.x + privatePartyRangeRect.w/2, privatePartyRangeRect.y + 9);
 
 
     //// kbblogo Drawing
-    var kbblogoRect = makeRect(frame.x + Math.floor((frame.w - 100) * 0.53459 + 0.5), frame.y + Math.floor((frame.h - 100) * 1.00000 + 0.5), 100, 100);
     context.beginPath();
-    context.rect(kbblogoRect.x, kbblogoRect.y, kbblogoRect.w, kbblogoRect.h);
+    context.rect(79, 120, 100, 100);
     context.save();
     context.clip();
-    context.drawImage(logo240, Math.floor(kbblogoRect.x + 0.5), Math.floor(kbblogoRect.y + 0.5), logo240.width, logo240.height);
+    context.drawImage(logo240, 79, 120, logo240.width, logo240.height);
     context.restore();
 
 
     //// Min Price Drawing
-    var minPriceRect = makeRect(frame.x + Math.floor((frame.w - 44) * 0.08372 + 0.5), frame.y + Math.floor((frame.h - 17) * 0.85561 + 0.5), 44, 17);
+    var minPriceRect = makeRect(29, 172, 44, 17);
     context.fillStyle = blackColor;
     context.font = '12px Tahoma, Verdana, Segoe, sans-serif';
     context.textAlign = 'left';
@@ -344,7 +341,7 @@ function drawCanvas(canvasId, data)
 
 
     //// Max Price Drawing
-    var maxPriceRect = makeRect(frame.x + Math.floor((frame.w - 60) * 0.94975 + 0.5), frame.y + Math.floor((frame.h - 17) * 0.85561 + 0.5), 60, 17);
+    var maxPriceRect = makeRect(171, 172, 60, 17);
     context.fillStyle = blackColor;
     context.font = '12px Tahoma, Verdana, Segoe, sans-serif';
     context.textAlign = 'right';
@@ -377,4 +374,40 @@ function drawCanvas(canvasId, data)
     context.font = '12px Tahoma, Verdana, Segoe, sans-serif';
     context.textAlign = 'center';
     context.fillText(veryGoodPriceContent, veryGoodPriceRect.x + veryGoodPriceRect.w/2, veryGoodPriceRect.y + 12);
+
+
+    //// Current Dot Drawing
+    oval(context, 164.5, 63.5, 10, 10);
+    context.save();
+    shadow(context);
+    context.fillStyle = currentPriceColor;
+    context.fill();
+
+    ////// Current Dot Inner Shadow
+    context.save();
+    context.clip();
+    context.moveTo(-10000, -10000);
+    context.lineTo(-10000, 10000);
+    context.lineTo(10001, 10000);
+    context.lineTo(10000, -10000);
+    context.closePath();
+    shadow3(context);
+    context.fillStyle = 'grey';
+    context.fill();
+    context.restore();
+    context.restore();
+
+    context.save();
+    shadow3(context);
+    context.strokeStyle = grey;
+    context.lineWidth = 3;
+    context.stroke();
+    context.restore();
+
+
+    //// Current Price Drawing
+    context.fillStyle = currentPriceColor;
+    context.font = '12px Tahoma, Verdana, Segoe, sans-serif';
+    context.textAlign = 'center';
+    context.fillText(currentPriceContent, currentPriceRect.x + currentPriceRect.w/2, currentPriceRect.y + 12);
 }
