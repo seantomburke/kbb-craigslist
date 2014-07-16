@@ -175,7 +175,7 @@ var handleResponse = function(response) {
 						}
 						$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
 						$("#kbb-price-canvas").html('<canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
-						drawCanvas('mainCanvas', d);
+						drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
 						$("#kbb").append($("<h1>", {
 							id: "price",
 							class: "priceInfo"
@@ -247,10 +247,10 @@ var makeDropdowns = function(){
 		},
 		error: function(jqXHR, textStatus, errorThrown){
 			var form = $("<form>",{id:"kbb-form"});
-	  		form.append($("<select>",{"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
-	  		form.append($("<select>",{"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
-	  		form.append($("<select>",{"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
-	  		form.append($("<select>",{"id":"kbb-mileage", "type":"text", "name":"mileage","value":carInfo["odometer"]}));
+	  		form.append($("<select>",{"id":"kbb-make", "type":"text", "name":"make","value":kbb_data["make"]}));
+	  		form.append($("<select>",{"id":"kbb-model", "type":"text", "name":"model","value":kbb_data["model"]}));
+	  		form.append($("<select>",{"id":"kbb-year", "type":"text", "name":"year","value":kbb_data["year"]}));
+	  		form.append($("<select>",{"id":"kbb-mileage", "type":"text", "name":"mileage","value":kbb_data["mileage"]}));
 	  		form.append($("<select>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
 	  		for(var i=0; i<data.length; i++){
 				var option = document.createElement("option");
@@ -262,10 +262,10 @@ var makeDropdowns = function(){
 		success: function(data, responseText, jqXHR){
 			console.log(data);
 			var form = $("<form>",{id:"kbb-form"});
-			form.append($("<select>",{"id":"kbb-year", "name":"year","value":carInfo["year"]}));
-			form.append($("<select>",{"id":"kbb-make", "name":"make","value":carInfo["make"]}));
-			form.append($("<select>",{"id":"kbb-model", "name":"model","value":carInfo["model"]}));
-			form.append($("<input>",{"id":"kbb-mileage","type":"text", "name":"mileage","value":carInfo["odometer"], "placeholder":"Mileage"}));
+			form.append($("<select>",{"id":"kbb-year", "name":"year","value":kbb_data["year"]}));
+			form.append($("<select>",{"id":"kbb-make", "name":"make","value":kbb_data["make"]}));
+			form.append($("<select>",{"id":"kbb-model", "name":"model","value":kbb_data["model"]}));
+			form.append($("<input>",{"id":"kbb-mileage","type":"text", "name":"mileage","value":kbb_data["mileage"], "placeholder":"Mileage"}));
 			form.append($("<input>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
 
 			$("#kbb").hide().html(form).fadeIn("slow");
@@ -313,6 +313,7 @@ var makeDropdowns = function(){
 
 var handleMakeDropdown = function(data){
 	$("#kbb-make").bind("change", function(){
+		$("#kbb-model").find("option").remove().add("<option>Model</option>");
 		var continueMake = true;
 		for(var i=0; i<data.length; i++){
 			if(continueMake && $(this).val() == data[i].Name)
