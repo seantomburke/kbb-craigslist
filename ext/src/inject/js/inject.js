@@ -226,7 +226,6 @@ var handleResponse = function(response) {
 							current_price = d.data.values.fpp.price;
 							priceLabel = "Fair Purchase Price: $" + current_price;
 						}
-
 						$("#kbb").hide().html($(response.img)).fadeIn("slow");
 						$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
 						$("#kbb").prepend($("<h1>", {
@@ -245,6 +244,9 @@ var handleResponse = function(response) {
 						else{
 							priceDiffLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (current_price - listPrice) +"</small></h1>";
 						}
+						$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
+						$("#kbb-price-canvas").html('<canvas id="mainCanvas" width="320" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
+						drawCanvas('mainCanvas', d);
 						$("#kbb").append($("<h1>", {
 							id: "price",
 							class: "priceInfo"

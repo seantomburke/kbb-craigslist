@@ -5,7 +5,11 @@
   "description": "Use Kelley Blue Book to find the real value of cars",
   "homepage_url": "http://www.seantburke.com",
   "web_accessible_resources": [
-    "src/inject/fonts/glyphicons-halflings-regular.*"
+    "src/inject/fonts/glyphicons-halflings-regular.*",
+    "src/inject/webcode/images/logo240.png",
+    "src/inject/webcode/images/logo240_2x.png",
+    "src/inject/webcode/scripts/canvas.js",
+    "src/inject/webcode/kbb.html"
   ],
   "icons": {
     "16": "icons/icon16.png",
@@ -58,7 +62,8 @@
         "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
         "src/bg/libs/bootstrap/bootstrap.min.js",
         "src/bg/libs/d3/d3.js",
-        "src/inject/js/inject.js"
+        "src/inject/js/inject.js",
+        "src/inject/webcode/scripts/canvas.js"
       ]
     }
   ]
