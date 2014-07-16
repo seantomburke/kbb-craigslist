@@ -33,7 +33,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log("categories sucess!");
@@ -63,7 +63,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log("Styles Success!");
@@ -95,7 +95,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log("options success!");
@@ -124,7 +124,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		iframe = $('<iframe>',{srcdoc: data,name:"price-iframe",id:"price-iframe", width:"500px",height:"1000px",sandbox:"allow-same-origin allow-scripts allow-top-navigation allow-forms"});
@@ -164,7 +164,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
@@ -197,7 +197,7 @@ function ajax(url, data, port){
 			  data: data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type});
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:request.type, url:request.url});
 			  },
 			  success: function(data, responseText, jqXHR){
 			  		console.log(data);

@@ -50,7 +50,7 @@ var addKbb = function(html){
 	$("#kbb-frame").prepend($("<h1>").html("Kelley Blue Book Value").hide().fadeIn("slow"));		
 	$("#kbb").append(html);
 };
-addKbb("Loading...");
+addKbb('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>');
 
 kbb_data = {};
 kbb_data['intent'] = "buy-used";
@@ -83,13 +83,78 @@ $.ajax({
 	  			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
 	  		}
 	  		else{
-	  		var form = $("<form>",{id:"kbb-form"});
-	  		form.append($("<input>",{"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
-	  		form.append($("<input>",{"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
-	  		form.append($("<input>",{"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
-	  		form.append($("<input>",{"id":"kbb-year", "type":"text", "name":"year","value":carInfo["mileage"]}));
-	  		form.append($("<input>",{"id":"kbb-submit", "type":"submit", "name":"submit","value":"submit"}));
-	  		$("#kbb").hide().html(form).fadeIn("slow");
+	  			$.ajax({
+	  				url: 'http://www.kbb.com/jsdata/2.2.62.4_45647/_makesmodels',
+	  				dataType: "json",
+	  				type: "GET",
+	  				data: {
+	  					vehicleclass: "UsedCar",
+	  					yearid: carInfo["year"]
+	  				},
+	  				error: function(jqXHR, textStatus, errorThrown){
+	  					var form = $("<form>",{id:"kbb-form"});
+				  		form.append($("<select>",{"id":"kbb-make", "type":"text", "name":"make","value":carInfo["make"]}));
+				  		form.append($("<select>",{"id":"kbb-model", "type":"text", "name":"model","value":carInfo["model"]}));
+				  		form.append($("<select>",{"id":"kbb-year", "type":"text", "name":"year","value":carInfo["year"]}));
+				  		form.append($("<select>",{"id":"kbb-mileage", "type":"text", "name":"mileage","value":carInfo["odometer"]}));
+				  		form.append($("<select>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
+				  		for(var i=0; i<data.length; i++){
+							var option = document.createElement("option");
+							option.text = jsonData[i].Name;
+							$('#kbb-make')[0].add(option);
+						}
+				  		$("#kbb").hide().html(form).fadeIn("slow");
+
+	  				},
+	  				success: function(data, responseText, jqXHR){
+	  					console.log(data);
+				  		var form = $("<form>",{id:"kbb-form"});
+				  		form.append($("<select>",{"id":"kbb-year", "name":"year","value":carInfo["year"]}));
+				  		form.append($("<select>",{"id":"kbb-make", "name":"make","value":carInfo["make"]}));
+				  		form.append($("<select>",{"id":"kbb-model", "name":"model","value":carInfo["model"]}));
+				  		form.append($("<input>",{"id":"kbb-mileage","type":"text", "name":"mileage","value":carInfo["odometer"], "placeholder":"Mileage"}));
+				  		form.append($("<input>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
+
+				  		$("#kbb").hide().html(form).fadeIn("slow");
+				  		$('#kbb-year').append($("<option>Year</option>"));
+				  		$('#kbb-make').append($("<option>Make</option>"));
+				  		$('#kbb-model').append($("<option>Model</option>"));
+				  		for(var i=1993; i<=new Date().getFullYear(); i++){
+				  			if(i == carInfo["year"])
+				  			{
+				  				$('#kbb-year').append($("<option selected value='" +i+ "'>"+i+"</option>"));
+				  			}
+				  			else
+				  			{
+				  				$('#kbb-year').append($("<option value='" +i+ "'>"+i+"</option>"));
+				  			}
+							
+						}
+				  		for(var i=0; i<data.length; i++){
+				  			if(data[i].Name.toUpperCase() == carInfo["make"].toUpperCase())
+				  			{
+				  				for(var j=0; j<data[i].Model.length; j++)
+				  				{
+				  					if(data[i].Model[j].Name.toUpperCase() == carInfo["model"].toUpperCase())
+				  					{
+				  						$('#kbb-model').append($("<option selected value='" + data[i].Model[j].Name+ "'>"+data[i].Model[j].Name+"</option>"));
+				  					}
+				  					else
+				  					{
+				  						$('#kbb-model').append($("<option value='" + data[i].Model[j].Name+ "'>"+data[i].Model[j].Name+"</option>"));	
+				  					}
+				  				}
+				  				$('#kbb-make').append($("<option selected value='" + data[i].Name+ "'>"+data[i].Name+"</option>"));
+				  			}
+				  			else
+				  			{
+								$('#kbb-make').append($("<option value='" + data[i].Name+ "'>"+data[i].Name+"</option>"));
+				  			}
+						}
+						handleForm(port);
+
+	  				}
+	  			});
 	  		}
 	  },
       success: function(data, responseText, jqXHR){
@@ -116,13 +181,31 @@ var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
 				console.log(e);
 				e.preventDefault();
-				$("#kbb").html($("<h1>").html("Loading...").hide().fadeIn("slow"));
+				$("#kbb").html($("<h1>").html('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>').hide().fadeIn("slow"));
 				var url = $(this).attr("href");
 				var type = (m=$(this).attr("href").match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 				console.log(url);
 				console.log(type);
 				port.postMessage({type:type, url: url, kbb_data: kbb_data});
-				port.onMessage.addListener(function(response) {
+				port.onMessage.addListener(handleResponse);
+			});
+}
+
+var handleForm = function(port){
+	$("#kbb-submit").on('click', function(e){
+		console.log(e);
+		e.preventDefault();
+		var url = ("http://www.kbb.com/"+ $("#kbb-make").val() +"/"+$("#kbb-model").val()+"/"+$("#kbb-year").val()+"-"+$("#kbb-make").val()+"-"+$("#kbb-model").val()+"/styles/").replace(/ /g,"-");
+		var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
+		$("#kbb").html($("<h1>").html('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>').hide().fadeIn("slow"));
+		console.log(url);
+		console.log(type);
+		port.postMessage({type:type, url: url, kbb_data: kbb_data});
+		port.onMessage.addListener(handleResponse);
+	})
+}
+
+var handleResponse = function(response) {
 					if(response.type == "default"){
 						console.log("This is the Default type");
 						console.log(response);
@@ -197,13 +280,4 @@ var handleClick = function(port){
 					}
 					$("#kbb").slideDown();
 				console.log("returned");
-				});
-			});
-}
-
-var handleForm = function(port){
-	$("#kbb-form").on('submit', function(){
-		var url = "http://www.kbb.com/";
-	})
-}
-
+				};
