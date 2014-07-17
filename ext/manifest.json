@@ -46,17 +46,6 @@
         "*://*.craigslist.org/ct*/*.html",
         "*://*.craigslist.org/*/ct*/*.html"
       ],
-      "css": [
-        "src/inject/css/inject.css",
-        "src/inject/css/bootstrap-theme.min.css",
-        "src/inject/css/bootstrap.min.css"
-      ]
-    },
-    {
-      "matches": [
-        "*://*.craigslist.org/ct*/*.html",
-        "*://*.craigslist.org/*/ct*/*.html"
-      ],
       "js": [
         "src/bg/libs/jquery/jquery-1.11.0.min.js",
         "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
@@ -64,6 +53,11 @@
         "src/bg/libs/d3/d3.js",
         "src/inject/js/inject.js",
         "src/inject/webcode/scripts/canvas.js"
+      ],
+      "css": [
+        "src/inject/css/inject.css",
+        "src/inject/css/bootstrap-theme.min.css",
+        "src/inject/css/bootstrap.min.css"
       ]
     }
   ]
