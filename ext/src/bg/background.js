@@ -49,7 +49,15 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						console.log(e.attr("href"),e.attr("href").match("javascript"));
+						if(e.attr("href").match("javascript"))
+						{
+							e.remove();
+						}
+						else
+						{
+							e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						}
 					});
 			  		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});
 			  		handleClick(port);
@@ -109,7 +117,14 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						if(e.attr("href").match("javascript"))
+						{
+							e.remove();
+						}
+						else
+						{
+							e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						}
 					});
 					handleClick(port);
 			  		url = $(extracted).find("#GetMyPrice").attr("href");

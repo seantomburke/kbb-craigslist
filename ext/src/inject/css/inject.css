@@ -44,6 +44,9 @@ h1#kbb-frame{
 	background-image:linear-gradient(#fff, #ddd);
 	-webkit-border-radius: 5px;
 }
+.row-white, .row-grey{
+	height: 70px;
+}
 
 .right{
 	float:right;
@@ -61,5 +64,26 @@ h1#kbb-frame{
 }
 
 .section-title{
-	font-size: 20px;
+	font-size: 16px;
 }
+
+.style-name{
+	float: left;
+	width: 115;
+}
+
+.mod-category-inner .section-title{
+	position: relative;
+	top: -15px;
+}
+
+.vehicle-styles-body.expanded-content{
+	display: none;
+}
+
+a.right.btn-main-cta.kbb-link {
+	position: relative;
+	top: -5px;
+}
+
+
