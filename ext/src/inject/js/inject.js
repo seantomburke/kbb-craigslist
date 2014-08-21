@@ -46,8 +46,8 @@ serialize = function(obj) {
 var addKbb = function(html){
 	$(".mapAndAttrs").prepend($("<div>").attr("id","kbb-frame").hide().fadeIn("slow"));
 	$("#kbb-frame").append($("<div>").attr("id","kbb").hide().fadeIn("slow"));
-	$("#kbb-frame").prepend($("<h1>").html("List Price: $"+ listPrice).hide().fadeIn("slow"))
-	$("#kbb-frame").prepend($("<h1>").html("Kelley Blue Book Value").hide().fadeIn("slow"));		
+	$("#kbb-frame").prepend($("<h1 id='listPrice'>").html("List Price: <span>$"+ listPrice+"</span>").hide().fadeIn("slow"))
+	$("#kbb-frame").prepend($("<h1 id='kbb-title'>").html("Kelley Blue Book").hide().fadeIn("slow"));		
 	$("#kbb").append(html);
 };
 addKbb('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>');
@@ -149,11 +149,11 @@ var handleResponse = function(response) {
 							current_price = kbb_price[carInfo['condition']];
 							console.log(current_price);
 							console.log("kbb_price['"+carInfo['condition']+"']");
-							priceLabel = "Price for "+ carInfo['condition'] +" Condition: $" + current_price;
+							priceLabel = "KBB Price for "+ carInfo['condition'] +" Condition: <font color='green'>$" + current_price + "</font>";
 						}
 						else{
 							current_price = d.data.values.fpp.price;
-							priceLabel = "Fair Purchase Price: $" + current_price;
+							priceLabel = "Fair Purchase Price: <font color='green'>$" + current_price + "</font>";
 						}
 						$("#kbb").hide().html($(response.img)).fadeIn("slow");
 						$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
@@ -173,13 +173,14 @@ var handleResponse = function(response) {
 						else{
 							priceDiffLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (current_price - listPrice) +"</small></h1>";
 						}
-						$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
-						$("#kbb-price-canvas").html('<canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
-						drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
+						priceDiffLabel = "List Price: "+ priceDiffLabel;
 						$("#kbb").append($("<h1>", {
 							id: "price",
 							class: "priceInfo"
 						}).html(priceDiffLabel).hide().fadeIn("slow"));
+						$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
+						$("#kbb-price-canvas").html('<canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
+						drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
 
 						$("#kbb").append($("<h2>", {
 							id: "priceexcellent",
@@ -269,9 +270,9 @@ var makeDropdowns = function(){
 			form.append($("<input>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
 
 			$("#kbb").hide().html(form).fadeIn("slow");
-			$('#kbb-year').append($("<option>Year</option>"));
-			$('#kbb-make').append($("<option>Make</option>"));
-			$('#kbb-model').append($("<option>Model</option>"));
+			$('#kbb-year').append($("<option value='0'>Year</option><option value=''>----</option>"));
+			$('#kbb-make').append($("<option value=' '>Make</option><option value=''>----</option>"));
+			$('#kbb-model').append($("<option value=' '>Model</option><option value=''>----</option>"));
 			for(var i=1993; i<=new Date().getFullYear(); i++){
 				if(i == carInfo["year"])
 				{
@@ -313,7 +314,7 @@ var makeDropdowns = function(){
 
 var handleMakeDropdown = function(data){
 	$("#kbb-make").bind("change", function(){
-		$("#kbb-model").find("option").remove().add("<option>Model</option>");
+		$("#kbb-model").find("option").remove().add("<option value='0'>Model</option><option value=''>----</option>");
 		var continueMake = true;
 		for(var i=0; i<data.length; i++){
 			if(continueMake && $(this).val() == data[i].Name)

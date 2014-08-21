@@ -18,17 +18,32 @@
 	color: #222222;
 }
 
+#kbb-frame #kbb-title {
+font-family: verdana;
+font-weight: 800;
+font-variant: small-caps;
+}
+
+#kbb-frame #listPrice span{
+font-weight: bold;
+}
+
+
 #kbb-frame h1{
-	font-size: 25px;
-	color: #1e3b6f;
-}
-
-h1#kbb-frame{
-	font-weight: bold;
 	font-size: 32px;
+	color: #1e3b6f;
+	font-weight: bold;
 }
 
-.selected {
+#kbb-frame h2{
+	font-size: 25px;
+}
+
+#kbb-frame h3{
+	font-size: 18px;
+}
+
+#kbb-frame .selected {
 	border-color: orange !important;
 	border-style: solid;
 	border-width: 3px;
@@ -36,7 +51,7 @@ h1#kbb-frame{
 	-webkit-border-radius: 5px;
 }
 
-.row-white, .row-grey, .mod-category{
+#kbb-frame .row-white, #kbb-frame .row-grey, #kbb-frame .mod-category{
 	padding:20px;
 	border-color: gray;
 	border-style: solid;
@@ -45,11 +60,11 @@ h1#kbb-frame{
 	-webkit-border-radius: 5px;
 }
 
-.right{
+#kbb-frame .right{
 	float:right;
 }
 
-.btn-main-cta{
+#kbb-frame .btn-main-cta{
 	border-color: orange;
 	border-style: solid;
 	border-width: 2px;
@@ -60,6 +75,7 @@ h1#kbb-frame{
 	text-decoration: none;
 }
 
-.section-title{
+#kbb-frame .section-title{
 	font-size: 20px;
 }
+
