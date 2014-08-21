@@ -46,10 +46,6 @@ font-weight: bold;
 	font-size: 16px;
 }
 
-#kbb-frame .expand{
-	display: none;
-}
-
 #kbb-frame .selected {
 	border-color: orange !important;
 	border-style: solid;
@@ -104,5 +100,9 @@ font-weight: bold;
 #kbb-frame .mod-category-inner .section-title{
 	position: relative;
 	top: -15px;
+}
+
+#kbb-frame .vehicle-styles-body.expanded-content{
+	display: none;
 }
 
