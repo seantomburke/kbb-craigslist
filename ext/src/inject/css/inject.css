@@ -30,17 +30,24 @@ font-weight: bold;
 
 
 #kbb-frame h1{
-	font-size: 32px;
+	font-size: 26px;
 	color: #1e3b6f;
-	font-weight: bold;
 }
 
 #kbb-frame h2{
-	font-size: 25px;
+	font-size: 22px;
 }
 
 #kbb-frame h3{
 	font-size: 18px;
+}
+
+#kbb-frame h4{
+	font-size: 16px;
+}
+
+#kbb-frame .expand{
+	display: none;
 }
 
 #kbb-frame .selected {
@@ -59,18 +66,25 @@ font-weight: bold;
 	background-image:linear-gradient(#fff, #ddd);
 	-webkit-border-radius: 5px;
 }
-.row-white, .row-grey{
+#kbb-frame .white{
+	color: white;
+}
+
+#kbb-frame .row-white, .row-grey{
 	height: 70px;
 }
 
 #kbb-frame .right{
-	float:right;
+	float: right;
 }
 
 #kbb-frame .btn-main-cta{
+	position: relative;
+	top: 10px;
 	border-color: orange;
 	border-style: solid;
 	border-width: 2px;
+	margin: 5px;
 	padding: 5px;
 	background-image:linear-gradient(#AD3410, #BD4520);
 	-webkit-border-radius: 5px;
@@ -92,11 +106,3 @@ font-weight: bold;
 	top: -15px;
 }
 
-#kbb-frame .vehicle-styles-body.expanded-content{
-	display: none;
-}
-
-#kbb-frame a.right.btn-main-cta.kbb-link {
-	position: relative;
-	top: -5px;
-}

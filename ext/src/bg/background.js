@@ -21,11 +21,11 @@ chrome.runtime.onConnect.addListener(function(port) {
 		{
 			port.postMessage({cars:cars, type:"popup"});
 		}
-		if(request.type == "test")
+		else if(request.type == "test")
 		{
 			console.log("Connected!");
 		}
-		if(request.type == "categories")
+		else if(request.type == "categories")
 		{
 			console.log("categories script started");
 			$.ajax({
@@ -65,22 +65,21 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  }
 			});
 		}
-		if(request.type == "styles"){
+		else if(request.type == "styles"){
 			console.log("starting styles script");
+			console.log(request.url);
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",
 			  type: "GET",
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
-						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
-			  },
+			  		console.log(request.carInfo["year"]);
+			  		port.postMessage({kbb_data:request.kbb_data, data:"error", type:'init_error'});	
+				},
 			  success: function(data, responseText, jqXHR){
 			  		console.log("Styles Success!");
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-			  		console.log($(extracted));
 		      		extracted.find("aside").remove();
 		      		extracted.find("*").removeClass("collapse");
 		      		//if(extracted.find(".selected"))
@@ -92,12 +91,14 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.addClass("kbb-link");
 						e.attr("href", "http://www.kbb.com" + e.attr("href"));
 					});
-					port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:request.type});	
+					console.log(request.type);
+					var type = (m=request.url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
+					port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:type});	
 					handleClick(port);
 			  }
 			});
 		}
-		if(request.type == "options"){
+		else if(request.type == "options"){
 			console.log("starting options script");
 			port.postMessage({kbb_data: request.kbb_data, type:"status", message:"Selecting Basic Options...", url:request.url});
 			$.ajax({
@@ -134,7 +135,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  }
 			});
 		}
-		if(request.type == "default"){
+		else if(request.type == "default"){
 			console.log("starting default script");
 			$.ajax({
 			  url: request.url,
@@ -172,7 +173,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  }
 			});
 		}
-		if(request.type == "condition"){
+		else if(request.type == "condition"){
 			console.log("starting condition script");
 			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
 			request.kbb_data["pricetype"] = pricetype;
@@ -206,7 +207,40 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  		kbbAJAX({url:url,kbb_data:request.kbb_data, data:$(extracted).html(), type:type});
 			  }
 			});
+		}else{
+			console.log("starting else script");
+			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
+			request.kbb_data["pricetype"] = pricetype;
+			port.postMessage({kbb_data: request.kbb_data, type:"status", message:"Selecting Default", url:request.url});
+			$.ajax({
+		      url: url,
+		      dataType: "html",
+		      type: "GET",
+		      data: kbb_data,
+			  error: function(jqXHR, textStatus, errorThrown){
+			  		console.log("error");
+					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
+					data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
+			  },
+		      success: function(data, responseText, jqXHR){
+		      		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
+		      		extracted.find("aside").remove();
+		      		extracted.find("*").removeClass("collapse");
+		      		//if(extracted.find(".selected"))
+		      		//extracted.find(".mod-category").not(".selected").remove();
+					$.each(extracted.find("a"), function(i,el){
+						var e = $(el);
+						e.attr("target","_BLANK");
+						e.attr("onclick", "");
+						e.addClass("kbb-link");
+						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+					});
+		      		$("#kbb").hide().html(extracted.html()).fadeIn("slow");
+		      		handleClick(port);
+		      }
+		    });
 		}
+
 	});
 });
 

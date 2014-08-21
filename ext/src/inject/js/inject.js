@@ -72,40 +72,44 @@ console.log(kbb_data["mileage"]);
 var url = ("http://www.kbb.com/"+carInfo["make"]+"/"+carInfo["model"]+"/"+carInfo["year"]+"-"+carInfo["make"]+"-"+carInfo["model"]+"/styles/").replace(/ /g,"-");
 console.log(url + "?" + serialize(kbb_data));
 //$("head").prepend($("<base>").attr("href","http://www.kbb.com/"));
-$.ajax({
-      url: url,
-      dataType: "html",
-      type: "GET",
-      data: kbb_data,
-	  error: function(jqXHR, textStatus, errorThrown){
-	  		if(carInfo["year"] < 1994)
-	  		{
-	  			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
-	  		}
-	  		else{
-	  			makeDropdowns();
-	  		}
-	  },
-      success: function(data, responseText, jqXHR){
-      		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-      		extracted.find("aside").remove();
-      		extracted.find("*").removeClass("collapse");
-      		//if(extracted.find(".selected"))
-      		//extracted.find(".mod-category").not(".selected").remove();
-			$.each(extracted.find("a"), function(i,el){
-				var e = $(el);
-				e.attr("target","_BLANK");
-				e.attr("onclick", "");
-				e.addClass("kbb-link");
-				e.attr("href", "http://www.kbb.com" + e.attr("href"));
-			});
-      		$("#kbb").hide().html(extracted.html()).fadeIn("slow");
-      		handleClick(port);
-      }
-    });
+var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
+port.postMessage({type:type, url: url, kbb_data: kbb_data, carInfo: carInfo});
+port.onMessage.addListener(function(response){
+	handleResponse(response);
+});
+// $.ajax({
+//       url: url,
+//       dataType: "html",
+//       type: "GET",
+//       data: kbb_data,
+// 	  error: function(jqXHR, textStatus, errorThrown){
+// 	  		if(carInfo["year"] < 1994)
+// 	  		{
+// 	  			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
+// 	  		}
+// 	  		else{
+// 	  			makeDropdowns();
+// 	  		}
+// 	  },
+//       success: function(data, responseText, jqXHR){
+//       		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
+//       		extracted.find("aside").remove();
+//       		extracted.find("*").removeClass("collapse");
+//       		//if(extracted.find(".selected"))
+//       		//extracted.find(".mod-category").not(".selected").remove();
+// 			$.each(extracted.find("a"), function(i,el){
+// 				var e = $(el);
+// 				e.attr("target","_BLANK");
+// 				e.attr("onclick", "");
+// 				e.addClass("kbb-link");
+// 				e.attr("href", "http://www.kbb.com" + e.attr("href"));
+// 			});
+//       		$("#kbb").hide().html(extracted.html()).fadeIn("slow");
+//       		handleClick(port);
+//       }
+//     });
 
 console.log("http://www.seantburke.com/");
-
 var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
 				console.log(e);
@@ -119,6 +123,7 @@ var handleClick = function(port){
 				port.onMessage.addListener(handleResponse);
 			});
 }
+handleClick(port);
 
 var handleForm = function(port){
 	$("#kbb-submit").on('click', function(e){
@@ -135,107 +140,115 @@ var handleForm = function(port){
 }
 
 var handleResponse = function(response) {
-					if(response.type == "default"){
-						console.log("This is the Default type");
-						console.log(response);
-						carPriceInfo = "("+(st=(s=response.data).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "").replace(/&quot;/g,"'")+")";
-						d=eval(carPriceInfo);
-						console.log(d);
+	console.log(response);
+	if(response.type == "default"){
+		console.log("This is the Default type");
+		console.log(response);
+		carPriceInfo = "("+(st=(s=response.data).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "").replace(/&quot;/g,"'")+")";
+		d=eval(carPriceInfo);
+		console.log(d);
 
 
-						kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
+		kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
 
-						if(kbb_price[carInfo['condition']]){
-							current_price = kbb_price[carInfo['condition']];
-							console.log(current_price);
-							console.log("kbb_price['"+carInfo['condition']+"']");
-							priceLabel = "KBB Price for "+ carInfo['condition'] +" Condition: <font color='green'>$" + current_price + "</font>";
-						}
-						else{
-							current_price = d.data.values.fpp.price;
-							priceLabel = "Fair Purchase Price: <font color='green'>$" + current_price + "</font>";
-						}
-						$("#kbb").hide().html($(response.img)).fadeIn("slow");
-						$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
-						$("#kbb").prepend($("<h1>", {
-							id: "carInfo"
-						}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
-						$("#kbb").append($("<h1>", {
-							id: "price",
-							class: "priceInfo"
-						}).html(priceLabel).hide().fadeIn("slow"));
-						var priceDiffLabel;
+		if(kbb_price[carInfo['condition']]){
+			current_price = kbb_price[carInfo['condition']];
+			console.log(current_price);
+			console.log("kbb_price['"+carInfo['condition']+"']");
+			priceLabel = "KBB Price for "+ carInfo['condition'] +" Condition: <font color='green'>$" + current_price + "</font>";
+		}
+		else{
+			current_price = d.data.values.fpp.price;
+			priceLabel = "Fair Purchase Price: <font color='green'>$" + current_price + "</font>";
+		}
+		$("#kbb").hide().html($(response.img)).fadeIn("slow");
+		$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
+		$("#kbb").prepend($("<h1>", {
+			id: "carInfo"
+		}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
+		$("#kbb").append($("<h1>", {
+			id: "price",
+			class: "priceInfo"
+		}).html(priceLabel).hide().fadeIn("slow"));
+		var priceDiffLabel;
 
-						if(listPrice > current_price)
-						{
-							priceDiffLabel = "<h1 style='color:red'>$"+ listPrice +"</label><small><span style='color:red;' class='glyphicon glyphicon-arrow-up'></span>$"+ (listPrice - current_price) +"</small></h1>";
-						}
-						else{
-							priceDiffLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (current_price - listPrice) +"</small></h1>";
-						}
-						priceDiffLabel = "List Price: "+ priceDiffLabel;
-						$("#kbb").append($("<h1>", {
-							id: "price",
-							class: "priceInfo"
-						}).html(priceDiffLabel).hide().fadeIn("slow"));
-						$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
-						$("#kbb-price-canvas").html('<canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
-						drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
+		if(listPrice > current_price)
+		{
+			priceDiffLabel = "<h1 style='color:red'>$"+ listPrice +"</label><small><span style='color:red;' class='glyphicon glyphicon-arrow-up'></span>$"+ (listPrice - current_price) +"</small></h1>";
+		}
+		else{
+			priceDiffLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (current_price - listPrice) +"</small></h1>";
+		}
+		priceDiffLabel = "List Price: "+ priceDiffLabel;
+		$("#kbb").append($("<h1>", {
+			id: "price",
+			class: "priceInfo"
+		}).html(priceDiffLabel).hide().fadeIn("slow"));
+		$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
+		$("#kbb-price-canvas").html('<canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
+		drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
 
-						$("#kbb").append($("<h2>", {
-							id: "priceexcellent",
-							class: "priceInfo"
-						}).html("Excellent: $" + d.data.values.privatepartyexcellent.price).hide().fadeIn("slow"));
-						$("#kbb").append($("<h2>", {
-							id: "priceverygood",
-							class: "priceInfo"
-						}).html("Very Good: $" + d.data.values.privatepartyverygood.price).hide().fadeIn("slow"));
-						$("#kbb").append($("<h2>", {
-							id: "pricegood",
-							class: "priceInfo"
-						}).html("Good: $" + d.data.values.privatepartygood.price).hide().fadeIn("slow"));
-						$("#kbb").append($("<h2>", {
-							id: "pricefair",
-							class: "priceInfo"
-						}).html("Fair: $" + d.data.values.privatepartyfair.price).hide().fadeIn("slow"));
+		$("#kbb").append($("<h2>", {
+			id: "priceexcellent",
+			class: "priceInfo"
+		}).html("Excellent: $" + d.data.values.privatepartyexcellent.price).hide().fadeIn("slow"));
+		$("#kbb").append($("<h2>", {
+			id: "priceverygood",
+			class: "priceInfo"
+		}).html("Very Good: $" + d.data.values.privatepartyverygood.price).hide().fadeIn("slow"));
+		$("#kbb").append($("<h2>", {
+			id: "pricegood",
+			class: "priceInfo"
+		}).html("Good: $" + d.data.values.privatepartygood.price).hide().fadeIn("slow"));
+		$("#kbb").append($("<h2>", {
+			id: "pricefair",
+			class: "priceInfo"
+		}).html("Fair: $" + d.data.values.privatepartyfair.price).hide().fadeIn("slow"));
 
-						var perc = (d.data.values.fpp.price-d.data.values.fpp.priceMin)/(d.data.values.fpp.priceMax-d.data.values.fpp.priceMin)*100;
-						$("#kbb").append($("<div>",{class:"row"}).html(
-							'<div class="col-xs-2">'+
-							'<h3><span class="label label-success">$'+d.data.values.fpp.priceMin+'</span></h3>'+
-							'</div><div class="col-xs-8">'+
-							'<div class="progress">'+
-							'<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="width:'+perc+'%;">$'+d.data.values.fpp.price+'</div></div></div>'+
-							'<div class="col-xs-1">'+
-							'<h3><span class="label label-danger">$'+d.data.values.fpp.priceMax+'</span></h3>'+
-							'</div>'
-							).hide().fadeIn("slow"));		
+		var perc = (d.data.values.fpp.price-d.data.values.fpp.priceMin)/(d.data.values.fpp.priceMax-d.data.values.fpp.priceMin)*100;
+		$("#kbb").append($("<div>",{class:"row"}).html(
+			'<div class="col-xs-2">'+
+			'<span class="label label-success">$'+d.data.values.fpp.priceMin+'</span>'+
+			'</div><div class="col-xs-8">'+
+			'<div class="progress">'+
+			'<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="width:'+perc+'%;">$'+d.data.values.fpp.price+'</div></div></div>'+
+			'<div class="col-xs-1">'+
+			'<span class="label label-danger">$'+d.data.values.fpp.priceMax+'</span>'+
+			'</div>'
+			).hide().fadeIn("slow"));		
 
-						$("#kbb").append($("<a>", {href:response.url + "&pricetype="+response.kbb_data.pricetype+"&mileage="+response.kbb_data.mileage+"&condition=all",class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
-						handleClick(port);
-					}
-					else if(response.type == "status")
-					{
-						console.log(response.message);
-						console.log(response.kbb_data);
-						$("#kbb").append($("<h1>").hide().html(response.message).fadeIn(5000));
-					}
-					else if(response.type == "error")
-					{
-						console.log(response.message);
-						console.log(response.kbb_data);
-						$("#kbb").html($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
-					}
-					else
-					{
-						console.log("Type is:" + response.type);
-						console.log(response);
-						$("#kbb").hide().html(response.data).fadeIn("slow");
-						handleClick(port);
-					}
-					$("#kbb").slideDown();
-				console.log("returned");
-				};
+		$("#kbb").append($("<a>", {href:response.url + "&pricetype="+response.kbb_data.pricetype+"&mileage="+response.kbb_data.mileage+"&condition=all",class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
+		handleClick(port);
+	}
+	else if(response.type == "status")
+	{
+		console.log(response.message);
+		console.log(response.kbb_data);
+		$("#kbb").append($("<h1>").hide().html(response.message).fadeIn(5000));
+	}
+	else if(response.type == "error")
+	{
+		console.log(response.message);
+		console.log(response.kbb_data);
+		$("#kbb").html($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
+	}
+	else if(response.type == "init_error"){
+		if(carInfo["year"] < 1994){
+			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
+		}
+		else{
+			makeDropdowns();
+		}
+	}
+	else
+	{
+		console.log("Type is:" + response.type);
+		$("#kbb").hide().html(response.data).fadeIn("slow");
+		handleClick(port);
+	}
+	$("#kbb").slideDown();
+console.log("returned");
+};
 
 var makeDropdowns = function(){
 	$.ajax({
