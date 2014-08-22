@@ -78,6 +78,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  		port.postMessage({kbb_data:request.kbb_data, data:"error", type:'init_error'});	
 				},
 			  success: function(data, responseText, jqXHR){
+			  		console.log(responseText);
+			  		console.log(jqXHR);
 			  		console.log("Styles Success!");
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
 		      		extracted.find("aside").remove();
