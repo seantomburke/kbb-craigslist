@@ -60,12 +60,17 @@ function drawCanvas(canvasId, input)
 
     var kbbStartAngle = (((fairprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;
     var kbbEndAngle = (((excellentprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;
+    kbbStartAngle = 225;
+    kbbEndAngle = 315;
     //// General Declarations
     var canvas = document.getElementById(canvasId);
     var context = canvas.getContext('2d');
 
+    var currentX = 129.5;
+    var currentY = 54.5;
 
     //// Color Declarations
+    var currentPriceColor = 'rgba(29, 52, 255, 1)';
     var blackColor = 'rgba(0, 0, 0, 1)';
     var whiteColor = 'rgba(255, 255, 255, 1)';
     var grey = 'rgba(237, 238, 237, 1)';
@@ -73,7 +78,6 @@ function drawCanvas(canvasId, input)
     var goodPriceColor = 'rgba(27, 160, 0, 0.86)';
     var bad = 'rgba(195, 24, 21, 1)';
     var color = 'rgba(255, 255, 255, 1)';
-    var currentPriceColor = 'rgba(29, 52, 255, 1)';
 
     //// Shadow Declarations
     function shadow(context)
@@ -102,10 +106,10 @@ function drawCanvas(canvasId, input)
     var greenSemiCircleEndAngle = 315;
     var privatePartyRangeContent = 'PRIVATE PARTY RANGE';
     var excellentPriceRect = makeRect(188, 70, 44, 17);
-    var fairPriceRect = makeRect(27, 68, 48, 17);
+    var veryGoodPriceRect = makeRect(146, 46, 48, 17);
+    var currentPriceRect = makeRect(111, 37, 48, 17);
     var goodPriceRect = makeRect(67, 44, 48, 17);
-    var veryGoodPriceRect = makeRect(111, 37, 48, 17);
-    var currentPriceRect = makeRect(146, 46, 48, 17);
+    var fairPriceRect = makeRect(27, 68, 48, 17);
 
     var redSemiCircleStartAngle = kbbEndAngle;
     var greySemiCircleEndAngle = redSemiCircleStartAngle;
@@ -119,6 +123,22 @@ function drawCanvas(canvasId, input)
     var goodPriceContent = '$'+ goodprice;
     var veryGoodPriceContent = '$'+verygoodprice;
     var currentPriceContent = '$'+listPrice;
+
+
+    if(listPrice < fairprice)
+    {
+        currentX = 2;
+        currentY = 120;
+        currentPriceColor = good;
+        currentPriceRect = makeRect(12, 100, 48, 17);
+    }
+    else if(listPrice > excellentprice)
+    {
+        currentX = 220;
+        currentY = 120;
+        currentPriceColor = bad;
+        currentPriceRect = makeRect(210, 100, 48, 17);
+    }
 
 
     //// Red Semi Circle Drawing
@@ -258,7 +278,7 @@ function drawCanvas(canvasId, input)
 
 
     //// Very Good Dot Drawing
-    oval(context, 129.5, 54.5, 10, 10);
+    oval(context, 164.5, 63.5, 10, 10);
     context.save();
     shadow(context);
     context.fillStyle = good;
@@ -377,7 +397,7 @@ function drawCanvas(canvasId, input)
 
 
     //// Current Dot Drawing
-    oval(context, 164.5, 63.5, 10, 10);
+    oval(context, currentX, currentY, 10, 10);
     context.save();
     shadow(context);
     context.fillStyle = currentPriceColor;
