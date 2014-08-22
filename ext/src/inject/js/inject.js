@@ -14,6 +14,21 @@ port.postMessage({type:"test",connection: "Connected!"});
 // 	listPrice=0;
 // }
 
+var conditions = {
+	"excellent" : [
+		'like new', 'new', 'excellent'
+	],
+	"very good" : [
+		'great'
+	],
+	"good" : [
+		'good', 'ok', 'okay'
+	],
+	"fair" : [
+		'fair', 'bad'
+	]
+}
+
 listPrice = (l=$(".postingtitle").text().match(/\$([\d,]+)/))?l[1].replace(/k/,"000"):0;
 
 carInfo = {};
@@ -21,7 +36,7 @@ $.each($(".mapAndAttrs p.attrgroup span"), function(i,el){
 		e = $(el).text().split(":");
 		if(typeof e[1] !== 'undefined'){
 			carInfo[e[0].trim()] = e[1].trim();
-			console.log("carInfo["+e[0].trim()+"] = "+e[1].trim());
+			console.log("carInfo['"+e[0].trim()+"'] = "+e[1].trim());
 		}			
 		else{
 			carInfo["car"] = e[0];
@@ -32,6 +47,23 @@ $.each($(".mapAndAttrs p.attrgroup span"), function(i,el){
 			console.log("carInfo['car'] = "+e[0].trim());
 		}
 });
+console.log("before", carInfo['condition']);
+carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['excellent']) > 0) ? 'excellent':carInfo['condition'];
+carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['very good']) > 0) ? 'very good':carInfo['condition'];
+carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['good']) > 0) ? 'good':carInfo['condition'];
+carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['fair']) > 0) ? 'fair':carInfo['condition'];
+console.log("after", carInfo['condition']);
+
+if(!carInfo["model"])
+{
+	var regex = new RegExp(carInfo["car"].trim() + "\\s(\\w+)\\s");
+	console.log(regex);
+	var title = $(".postingtitle").text().match(regex);
+	console.log(title);
+	if(title && title.length > 1)
+		carInfo["model"] = title[1];
+	console.log(carInfo["model"]);
+}
 
 serialize = function(obj) {
   var str = [];
@@ -153,17 +185,14 @@ var handleResponse = function(response) {
 
 		if(kbb_price[carInfo['condition']]){
 			current_price = kbb_price[carInfo['condition']];
-			console.log(current_price);
-			console.log("kbb_price['"+carInfo['condition']+"']");
-			priceLabel = "KBB Price for "+ carInfo['condition'] +" Condition: <font color='green'>$" + current_price + "</font>";
 		}
 		else{
-			current_price = d.data.values.fpp.price;
-			priceLabel = "Fair Purchase Price: <font color='green'>$" + current_price + "</font>";
+			current_price = kbb_price['fair'];
 		}
+		priceLabel = "Kbb Price: <span color='green'>$" + current_price + "</span>";
 		$("#kbb").hide().html($(response.img)).fadeIn("slow");
 		$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
-		$("#kbb").prepend($("<h1>", {
+		$("#kbb").prepend($("<h2>", {
 			id: "carInfo"
 		}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
 		$("#kbb").append($("<h1>", {
@@ -174,10 +203,10 @@ var handleResponse = function(response) {
 
 		if(listPrice > current_price)
 		{
-			priceDiffLabel = "<h1 style='color:red'>$"+ listPrice +"</label><small><span style='color:red;' class='glyphicon glyphicon-arrow-up'></span>$"+ (listPrice - current_price) +"</small></h1>";
+			priceDiffLabel = "<span class='red'>$"+ listPrice +"</span> <br><small class='red'>$"+ (listPrice - current_price) +" overpriced</small></h1>";
 		}
 		else{
-			priceDiffLabel = "<h1 style='color:green'>$"+ listPrice +"</label><small><span style='color:green;' class='glyphicon glyphicon-arrow-down'></span>$"+ (current_price - listPrice) +"</small></h1>";
+			priceDiffLabel = "<span class='green'>$"+ listPrice +"</span> <br><small class='green'>$"+ (current_price - listPrice) +" underpriced</small></h1>";
 		}
 		priceDiffLabel = "List Price: "+ priceDiffLabel;
 		$("#kbb").append($("<h1>", {
@@ -224,17 +253,19 @@ var handleResponse = function(response) {
 	{
 		console.log(response.message);
 		console.log(response.kbb_data);
-		$("#kbb").append($("<h1>").hide().html(response.message).fadeIn(5000));
+		$("#kbb").append($("<h1>").html(response.message).fadeIn(5000));
 	}
 	else if(response.type == "error")
 	{
 		console.log(response.message);
 		console.log(response.kbb_data);
-		$("#kbb").html($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
+		makeDropdowns();
+		$("#kbb").prepend($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
 	}
 	else if(response.type == "init_error"){
 		if(carInfo["year"] < 1994){
-			$("#kbb").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow");
+			makeDropdowns();
+			$("#kbb").append($("<div>").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow"));
 		}
 		else{
 			makeDropdowns();
@@ -244,6 +275,7 @@ var handleResponse = function(response) {
 	{
 		console.log("Type is:" + response.type);
 		$("#kbb").hide().html(response.data).fadeIn("slow");
+		$("#kbb").append($("<a>", {href:response.url + "&pricetype="+response.kbb_data.pricetype+"&mileage="+response.kbb_data.mileage+"&condition=all",class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
 		handleClick(port);
 	}
 	$("#kbb").slideDown();
