@@ -106,3 +106,26 @@ font-weight: bold;
 	display: none;
 }
 
+#kbb-frame .excellent{
+	color: #00FF00;
+}
+
+#kbb-frame .verygood{
+	color: #007700;
+}
+
+#kbb-frame .good{
+	color: #007777;
+}
+
+#kbb-frame .fair{
+	color: #FFFF00;
+}
+
+#kbb-frame .green{
+	color: #00FF00;
+}
+
+#kbb-frame .red{
+	color: #FF0000;
+}
