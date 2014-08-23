@@ -50,8 +50,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						console.log(e.attr("href"),e.attr("href").match("javascript"));
-						if(e.attr("href").match("javascript"))
+						var b;
+						var matches = (b=e.attr("href")) ? b.match(/javascript/): false;
+						if(matches)
 						{
 							e.remove();
 						}
@@ -60,7 +61,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 							e.attr("href", "http://www.kbb.com" + e.attr("href"));
 						}
 					});
-			  		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:"styles"});
+			  		port.postMessage({url: request.url, kbb_data:request.kbb_data, data:$(extracted).html(), type:"styles"});
 			  		handleClick(port);
 			  }
 			});
@@ -74,7 +75,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  type: "GET",
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		port.postMessage({kbb_data:request.kbb_data, data:"error", type:'init_error'});	
+			  		port.postMessage({url: request.url, kbb_data:request.kbb_data, data:"error", type:'init_error'});	
 				},
 			  success: function(data, responseText, jqXHR){
 			  		console.log(responseText);
@@ -94,11 +95,21 @@ chrome.runtime.onConnect.addListener(function(port) {
 							e.attr("target","_BLANK");
 							e.attr("onclick", "");
 							e.addClass("kbb-link");
-							e.attr("href", "http://www.kbb.com" + e.attr("href"));
+							var b;
+							var matches = (b=e.attr("href")) ? b.match(/javascript/): false;
+							if(matches)
+							{
+								e.remove();
+							}
+							else
+							{
+								e.attr("href", "http://www.kbb.com" + e.attr("href"));
+							}
+							
 						});
 						console.log(request.type);
 						var type = (m=request.url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
-						port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:type});	
+						port.postMessage({url: request.url, kbb_data:request.kbb_data, data:$(extracted).html(), type:type});	
 						handleClick(port);
 					}
 					else{
@@ -110,7 +121,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		else if(request.type == "options"){
 			console.log("starting options script");
-			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 25, message:"Choosing Options...", url:request.url});
+			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 65, message:"Choosing Options...", url:request.url});
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",
@@ -129,7 +140,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						if(e.attr("href").match("javascript"))
+						var b;
+						var matches = (b=e.attr("href")) ? b.match(/javascript/): false;
+						if(matches)
 						{
 							e.remove();
 						}
@@ -169,7 +182,16 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						var b;
+						var matches = (b=e.attr("href")) ? b.match(/javascript/): false;
+						if(matches)
+						{
+							e.remove();
+						}
+						else
+						{
+							e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						}
 					});
 
 					$(document).ready(function(){
@@ -187,7 +209,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			console.log("starting condition script");
 			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
 			request.kbb_data["pricetype"] = pricetype;
-			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 50, message:"Selecting Condition", url:request.url});
+			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 80, message:"Selecting Condition", url:request.url});
 			$.ajax({
 			  url: request.url,
 			  dataType: "html",
@@ -208,7 +230,16 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						var b;
+						var matches = (b=e.attr("href")) ? b.match(/javascript/): false;
+						if(matches)
+						{
+							e.remove();
+						}
+						else
+						{
+							e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						}
 					});
 					handleClick(port);
 					var url = $(extracted).find(".btn-main-cta").first().attr("href");
@@ -221,7 +252,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			console.log("starting else script");
 			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
 			request.kbb_data["pricetype"] = pricetype;
-			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 75, message:"Loading...", url:request.url});
+			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 95, message:"Loading...", url:request.url});
 			$.ajax({
 		      url: request.url,
 		      dataType: "html",
@@ -243,12 +274,21 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.attr("target","_BLANK");
 						e.attr("onclick", "");
 						e.addClass("kbb-link");
-						e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						var b;
+						var matches = (b=e.attr("href")) ? b.match(/javascript/): false;
+						if(matches)
+						{
+							e.remove();
+						}
+						else
+						{
+							e.attr("href", "http://www.kbb.com" + e.attr("href"));
+						}
 					});
 		      		handleClick(port);
 		      		var url = $(extracted).find(".btn-main-cta").first().attr("href");
 		      		var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
-		      		port.postMessage({kbb_data:request.kbb_data, data:$(extracted).html(), type:type});
+		      		port.postMessage({url: request.url, kbb_data:request.kbb_data, data:$(extracted).html(), type:type});
 		      }
 		    });
 		}
@@ -256,32 +296,6 @@ chrome.runtime.onConnect.addListener(function(port) {
 	});
 });
 
-function ajax(url, data, port){
-	$.ajax({
-			  url: url,
-			  dataType: "html",
-			  type: "GET",
-			  data: data,
-			  error: function(jqXHR, textStatus, errorThrown){
-			  		console.log("error");
-					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
-						data:"<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a></div>"});
-			  },
-			  success: function(data, responseText, jqXHR){
-			  		console.log(data);
-			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-			  		$.each(extracted.find("a"), function(i,el){
-						var e = $(el);
-						e.attr("target","_BLANK");
-						e.attr("onclick", "");
-						e.addClass("kbb-link");
-					});
-					handleClick(port);
-			  		url = $(data).find("#GetMyPrice").attr("href");
-			  		port.postMessage({url: url, kbb_data:request.kbb_data, data:data, type:request.type});
-			  }
-	});
-};
 
 var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
