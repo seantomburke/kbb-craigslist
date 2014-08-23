@@ -18,6 +18,10 @@
 	color: #222222;
 }
 
+#kbb-frame table.table, #kbb-frame td, #kbb-frame th, #kbb-frame tr, #kbb-frame thead{
+	border-color: #6f8FBf !important;
+}
+
 #kbb-frame #kbb-title {
 font-family: verdana;
 font-weight: 800;
@@ -111,19 +115,39 @@ font-weight: bold;
 }
 
 #kbb-frame .excellent{
-	color: #00FF00;
+	color: #009900;
 }
 
 #kbb-frame .verygood{
-	color: #007700;
+	color: #99FF00;
 }
 
 #kbb-frame .good{
-	color: #007777;
+	color: #FFFF33;
 }
 
 #kbb-frame .fair{
-	color: #FFFF00;
+	color: #FF5500;
+}
+
+#kbb-frame td.excellent{
+	background-color: #009900;
+	color: black !important;
+}
+
+#kbb-frame td.verygood{
+	background-color: #99FF00;
+	color: black !important;
+}
+
+#kbb-frame td.good{
+	background-color: #FFFF33;
+	color: black !important;
+}
+
+#kbb-frame td.fair{
+	background-color: #FF5500;
+	color: black !important;
 }
 
 #kbb-frame .green{

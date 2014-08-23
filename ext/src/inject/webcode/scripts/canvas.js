@@ -116,13 +116,13 @@ function drawCanvas(canvasId, input)
     var greenSemiCircleStartAngle = kbbStartAngle;
     var greenSemiCircleEndAngle = redSemiCircleStartAngle;
 
-    var minPriceContent = "$" + scaleLow;
-    var maxPriceContent = '$'+ scaleHigh;
-    var excellentPriceContent = '$' + excellentprice;
-    var fairPriceContent = '$'+fairprice;
-    var goodPriceContent = '$'+ goodprice;
-    var veryGoodPriceContent = '$'+verygoodprice;
-    var currentPriceContent = '$'+listPrice;
+    var minPriceContent = scaleLow.toMoney();
+    var maxPriceContent = scaleHigh.toMoney();
+    var excellentPriceContent = excellentprice.toMoney();
+    var fairPriceContent = fairprice.toMoney();
+    var goodPriceContent = goodprice.toMoney();
+    var veryGoodPriceContent = verygoodprice.toMoney();
+    var currentPriceContent = listPrice.toMoney();
 
 
     if(listPrice < fairprice)
