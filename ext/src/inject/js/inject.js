@@ -238,7 +238,7 @@ var handleResponse = function(response) {
 		$("#kbb").append($("<div>",{class:"row"}).html(
 			'<div class="col-xs-2">'+
 			'<span class="label label-success">$'+d.data.values.fpp.priceMin+'</span>'+
-			'</div><div class="col-xs-8">'+
+			'</div><div class="col-xs-7">'+
 			'<div class="progress">'+
 			'<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="width:'+perc+'%;">$'+d.data.values.fpp.price+'</div></div></div>'+
 			'<div class="col-xs-1">'+
@@ -253,19 +253,23 @@ var handleResponse = function(response) {
 	{
 		console.log(response.message);
 		console.log(response.kbb_data);
-		$("#kbb").append($("<h1>").html(response.message).fadeIn(5000));
+		$("#kbb").html($('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="'+response.progress+'" style="width: '+response.progress+'%">' + response.message+ '</div></div>').hide().fadeIn("slow"));
 	}
 	else if(response.type == "error")
 	{
 		console.log(response.message);
 		console.log(response.kbb_data);
-		makeDropdowns();
-		$("#kbb").prepend($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
+		makeDropdowns(function(){
+				$("#kbb").prepend($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
+			});
+		
 	}
 	else if(response.type == "init_error"){
 		if(carInfo["year"] < 1994){
-			makeDropdowns();
-			$("#kbb").append($("<div>").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow"));
+			makeDropdowns(function(){
+				$("#kbb").prepend($("<div>").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow"));
+			});
+			
 		}
 		else{
 			makeDropdowns();
@@ -282,7 +286,7 @@ var handleResponse = function(response) {
 console.log("returned");
 };
 
-var makeDropdowns = function(){
+var makeDropdowns = function(callback){
 	$.ajax({
 		url: 'http://www.kbb.com/jsdata/_makesmodels',
 		dataType: "json",
@@ -352,6 +356,7 @@ var makeDropdowns = function(){
 			}
 			handleMakeDropdown(data);
 			handleForm(port);
+			callback();
 		}
 	});
 };
@@ -373,12 +378,4 @@ var handleMakeDropdown = function(data){
 		}
 	});
 };
-
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-ga('require', 'displayfeatures');
-ga('create', 'UA-42611920-3', { 'userId': chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')});
-ga('send', 'pageview');
 

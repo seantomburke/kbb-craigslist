@@ -7,7 +7,7 @@
 	border-width: 2px;
 	border-style: solid;
 	background-image: linear-gradient(#8fAFDf, #9fBDEf);
-	padding: 20px;
+	padding: 10px;
 	margin-bottom: 20px;
 	min-width: 300px;
 	max-width: 500px;
@@ -55,7 +55,7 @@ font-weight: bold;
 }
 
 #kbb-frame .row-white, #kbb-frame .row-grey, #kbb-frame .mod-category{
-	padding:20px;
+	padding:10px;
 	border-color: gray;
 	border-style: solid;
 	border-width: 2px;
@@ -128,4 +128,12 @@ font-weight: bold;
 
 #kbb-frame .red{
 	color: #FF0000;
+}
+
+#kbb-frame .clear{
+	margin-top: 10px;
+}
+
+#kbb-frame .not-sure{
+	display: none;
 }
