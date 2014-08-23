@@ -75,14 +75,11 @@ serialize = function(obj) {
 }
 
 
-var addKbb = function(html){
-	$(".mapAndAttrs").prepend($("<div>").attr("id","kbb-frame").hide().fadeIn("slow"));
-	$("#kbb-frame").append($("<div>").attr("id","kbb").hide().fadeIn("slow"));
-	$("#kbb-frame").prepend($("<h1 id='listPrice'>").html("List Price: <span>$"+ listPrice+"</span>").hide().fadeIn("slow"))
-	$("#kbb-frame").prepend($("<h1 id='kbb-title'>").html("Kelley Blue Book").hide().fadeIn("slow"));		
-	$("#kbb").append(html);
-};
-addKbb('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>');
+$(".mapAndAttrs").prepend($("<div>").attr("id","kbb-frame").hide().fadeIn("slow"));
+$("#kbb-frame").append($("<h1 id='kbb-title'>").html("Kelley Blue Book").hide().fadeIn("slow"));
+$("#kbb-frame").append($("<h1 id='listPrice'>").html("List Price: <span>$"+ listPrice+"</span>").hide().fadeIn("slow"));
+$("#kbb-frame").append('<div id="kbb-progress" class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100" style="width: 50%">Loading...</div></div>');
+$("#kbb-frame").append($("<div>").attr("id","kbb").hide().fadeIn("slow"));
 
 kbb_data = {};
 kbb_data['intent'] = "buy-used";
@@ -146,7 +143,9 @@ var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
 				console.log(e);
 				e.preventDefault();
-				$("#kbb").html($("<h1>").html('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>').hide().fadeIn("slow"));
+				$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+				$("#kbb-progress .progress-bar").css("width", 50 + "%");
+				$("#kbb-progress").hide().fadeIn("slow");
 				var url = $(this).attr("href");
 				var type = (m=$(this).attr("href").match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 				console.log(url);
@@ -163,7 +162,9 @@ var handleForm = function(port){
 		e.preventDefault();
 		var url = ("http://www.kbb.com/"+ $("#kbb-make").val() +"/"+$("#kbb-model").val()+"/"+$("#kbb-year").val()+"-"+$("#kbb-make").val()+"-"+$("#kbb-model").val()+"/styles/?intent=buy-used&mileage=" + $("#kbb-mileage").val()).replace(/ /g,"-");
 		var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
-		$("#kbb").html($("<h1>").html('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div></div>').hide().fadeIn("slow"));
+		$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+		$("#kbb-progress .progress-bar").css("width", 50 + "%");
+		$("#kbb-progress").hide().fadeIn("slow");
 		console.log(url);
 		console.log(type);
 		port.postMessage({type:type, url: url, kbb_data: kbb_data});
@@ -173,6 +174,8 @@ var handleForm = function(port){
 
 var handleResponse = function(response) {
 	console.log(response);
+	$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+	$("#kbb-progress .progress-bar").css("width", 50 + "%");
 	if(response.type == "default"){
 		console.log("This is the Default type");
 		console.log(response);
@@ -190,6 +193,9 @@ var handleResponse = function(response) {
 			current_price = kbb_price['fair'];
 		}
 		priceLabel = "Kbb Price: <span color='green'>$" + current_price + "</span>";
+		$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+		$("#kbb-progress .progress-bar").css("width", 100 + "%");
+		$("#kbb-progress").slideUp();
 		$("#kbb").hide().html($(response.img)).fadeIn("slow");
 		$("#kbb").prepend($("<h2>Mileage: "+ d.mileage+"<h2>"));
 		$("#kbb").prepend($("<h2>", {
@@ -246,20 +252,29 @@ var handleResponse = function(response) {
 			'</div>'
 			).hide().fadeIn("slow"));		
 
-		$("#kbb").append($("<a>", {href:response.url + "&pricetype="+response.kbb_data.pricetype+"&mileage="+response.kbb_data.mileage+"&condition=all",class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
+		$("#kbb").append($("<a>", {href:response.url ,class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
 		handleClick(port);
 	}
 	else if(response.type == "status")
 	{
 		console.log(response.message);
 		console.log(response.kbb_data);
-		$("#kbb").html($('<div class="progress"><div class="progress-bar progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="'+response.progress+'" style="width: '+response.progress+'%">' + response.message+ '</div></div>').hide().fadeIn("slow"));
+		$("#kbb-progress .progress-bar").attr("aria-valuenow", response.progress);
+		$("#kbb-progress .progress-bar").css("width", response.progress + "%");
+		$("#kbb-progress .progress-bar").text(response.message);
+		$("#kbb-progress").fadeIn("slow");
 	}
 	else if(response.type == "error")
 	{
 		console.log(response.message);
 		console.log(response.kbb_data);
 		makeDropdowns(function(){
+				$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+				$("#kbb-progress .progress-bar").css("width", 100 + "%");
+				$("#kbb-progress").slideUp("fast", function(){
+					$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+					$("#kbb-progress .progress-bar").css("width", 50 + "%");
+				});
 				$("#kbb").prepend($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
 			});
 		
@@ -267,6 +282,12 @@ var handleResponse = function(response) {
 	else if(response.type == "init_error"){
 		if(carInfo["year"] < 1994){
 			makeDropdowns(function(){
+				$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+				$("#kbb-progress .progress-bar").css("width", 100 + "%");
+				$("#kbb-progress").slideUp("fast", function(){
+					$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+					$("#kbb-progress .progress-bar").css("width", 50 + "%");
+				});
 				$("#kbb").prepend($("<div>").hide().html("<div class='alert alert-warning' role='alert'>Sorry. Kelley Blue Book does not provide information for cars older than 1994</div>").fadeIn("slow"));
 			});
 			
@@ -278,8 +299,14 @@ var handleResponse = function(response) {
 	else
 	{
 		console.log("Type is:" + response.type);
+		$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+		$("#kbb-progress .progress-bar").css("width", 100 + "%");
+		$("#kbb-progress").slideUp("fast", function(){
+					$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+					$("#kbb-progress .progress-bar").css("width", 50 + "%");
+				});
 		$("#kbb").hide().html(response.data).fadeIn("slow");
-		$("#kbb").append($("<a>", {href:response.url + "&pricetype="+response.kbb_data.pricetype+"&mileage="+response.kbb_data.mileage+"&condition=all",class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
+		$("#kbb").append($("<a>", {href:response.url,class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
 		handleClick(port);
 	}
 	$("#kbb").slideDown();
@@ -307,6 +334,12 @@ var makeDropdowns = function(callback){
 				option.text = jsonData[i].Name;
 				$('#kbb-make')[0].add(option);
 			}
+			$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+			$("#kbb-progress .progress-bar").css("width", 100 + "%");
+			$("#kbb-progress").slideUp("fast", function(){
+					$("#kbb-progress .progress-bar").attr("aria-valuenow", 50);
+					$("#kbb-progress .progress-bar").css("width", 50 + "%");
+				});
 	  		$("#kbb").hide().html(form).fadeIn("slow");
 		},
 		success: function(data, responseText, jqXHR){
@@ -318,6 +351,9 @@ var makeDropdowns = function(callback){
 			form.append($("<input>",{"id":"kbb-mileage","type":"text", "name":"mileage","value":kbb_data["mileage"], "placeholder":"Mileage"}));
 			form.append($("<input>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
 
+			$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+			$("#kbb-progress .progress-bar").css("width", 100 + "%");
+			$("#kbb-progress").slideUp();
 			$("#kbb").hide().html(form).fadeIn("slow");
 			$('#kbb-year').append($("<option value='0'>Year</option><option value=''>----</option>"));
 			$('#kbb-make').append($("<option value=' '>Make</option><option value=''>----</option>"));
