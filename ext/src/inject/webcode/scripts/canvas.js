@@ -127,17 +127,17 @@ function drawCanvas(canvasId, input)
 
     if(listPrice < fairprice)
     {
-        currentX = 2;
-        currentY = 120;
-        currentPriceColor = good;
-        currentPriceRect = makeRect(12, 100, 48, 17);
+        currentX = 28;
+        currentY = 130;
+        currentPriceColor = goodPriceColor;
+        currentPriceRect = makeRect(6, 110, 48, 17);
     }
     else if(listPrice > excellentprice)
     {
         currentX = 220;
-        currentY = 120;
+        currentY = 130;
         currentPriceColor = bad;
-        currentPriceRect = makeRect(210, 100, 48, 17);
+        currentPriceRect = makeRect(220, 110, 48, 17);
     }
 
 
