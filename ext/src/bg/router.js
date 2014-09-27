@@ -33,7 +33,7 @@ define([
     });
     app_router.on('defaultAction', function(actions){
       // We have no matching route, lets just log what the URL was
-      console.log('No route:', actions);
+      //console.log'No route:', actions);
     });
     Backbone.history.start();
   };
