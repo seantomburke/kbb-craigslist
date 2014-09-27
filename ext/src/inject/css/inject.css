@@ -4,9 +4,9 @@
 
 #kbb-frame{
 	border-color: #1e3b6f;
+	background-color: #9fBDEf;
 	border-width: 2px;
 	border-style: solid;
-	background-image: linear-gradient(#8fAFDf, #9fBDEf);
 	padding: 10px;
 	margin-bottom: 20px;
 	min-width: 300px;
@@ -32,6 +32,22 @@ font-variant: small-caps;
 font-weight: bold;
 }
 
+#kbb-frame #kbb-iframe{
+	overflow: hidden;
+}
+
+#kbb-frame #mainCanvas{
+	position: relative;
+	top: -100px;
+	z-index: 9;
+}
+
+#kbb-frame #kbblogo{
+	position: relative;
+	top: 124px;
+	left: 81px;
+	z-index: 10;
+}
 
 #kbb-frame h1{
 	font-size: 26px;
@@ -71,7 +87,7 @@ font-weight: bold;
 }
 
 #kbb-frame .row-white, .row-grey{
-	height: 70px;
+	height: 85px;
 }
 
 #kbb-frame .right{
@@ -111,7 +127,7 @@ font-weight: bold;
 }
 
 #kbb-frame .vehicle-styles-body.expanded-content{
-	display: none;
+	display: block;
 }
 
 #kbb-frame .excellent{
@@ -163,5 +179,21 @@ font-weight: bold;
 }
 
 #kbb-frame .not-sure{
+	display: none;
+}
+
+#kbb-frame .collapse{
+	display: block !important;
+}
+
+#kbb-frame .engines-and-drivetrains{
+	display: none !important;
+}
+
+#kbb-frame .engine-container{
+	display: none !important;
+}
+
+#kbb-frame .includes-and-cta-container, #kbb-frame .also-standard, #kbb-frame .ad-label   {
 	display: none;
 }
