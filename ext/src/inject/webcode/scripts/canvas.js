@@ -39,7 +39,7 @@ function dot(context, degrees, radius, w, h){
 
     var x = radius*Math.cos(toRadians(degrees+180));
     var y = radius*Math.sin(toRadians(degrees+180));
-    console.log({x:x,y:y, degrees: degrees, radius:radius});
+    //console.log{x:x,y:y, degrees: degrees, radius:radius});
 
     context.translate(x, y);
     context.scale(w/2, h/2);
@@ -97,7 +97,7 @@ function drawCanvas(canvasId, input)
 
     //// Image Declarations
     var logo240 = new Image();
-    logo240.src = 'images/logo240.png';
+    logo240.src = chrome.extension.getURL('/src/inject/webcode/images/logo240.png');
 
     //// Abstracted Attributes
     var redSemiCircleStartAngle = 315;
@@ -347,8 +347,8 @@ function drawCanvas(canvasId, input)
     context.beginPath();
     context.rect(79, 120, 100, 100);
     context.save();
-    context.clip();
     context.drawImage(logo240, 79, 120, logo240.width, logo240.height);
+    context.clip();
     context.restore();
 
 
