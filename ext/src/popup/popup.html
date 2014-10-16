@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Backbone.js Library</title>
+    <link rel="stylesheet" href="/css/screen.css">
+</head>
+<body>
+<div id="cars">
+    <div class="carContainer">
+        <img src="/src/inject/img/ajax-loader.gif"/>
+        <ul>
+            <li>Make</li>
+            <li>Model</li>
+            <li>Year</li>
+            <li>Mileage</li>
+        </ul>
+    </div>
+    <script id="carTemplate" type="text/template"> 
+        <img src="<%= coverImage %>"/>
+        <ul>
+            <li><%= make %></li>
+            <li><%= model %></li>
+            <li><%= year %></li>
+            <li><%= mileage %></li>
+        </ul>
+    </script>
+    
+	<script src="/src/bg/libs/jquery/jquery-1.11.0.min.js"></script>
+	<script src="/src/bg/libs/jquery/jquery-migrate-1.2.1.min.js"></script>
+	<script src="/src/bg/libs/underscore/underscore.js"></script>
+	<script src="/src/bg/libs/backbone/backbone.js"></script>
+	<script src="/src/popup/popup.js"></script>
+</div>
+</body>
+</html>
