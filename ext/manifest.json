@@ -21,12 +21,9 @@
   "default_locale": "en",
   "background": {
     "scripts": [
-      "src/bg/libs/require/require.js",
-      "src/bg/libs/backbone/backbone.js",
-      "src/bg/models/KBB.js",
       "src/bg/libs/jquery/jquery-1.11.0.min.js",
       "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
-      "src/bg/main.js"
+      "src/bg/background.js"
     ],
     "persistent": true
   },

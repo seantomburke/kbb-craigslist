@@ -9,14 +9,14 @@
 
 
 $("<div>", {id:"kbb-iframe"}).appendTo("body");
-cars = {};
+cars = [];
 
 chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");
-	//console.logport);
+	//console.log(port);
 	port.onMessage.addListener(function kbbAJAX(request) {
-		//console.logrequest.url);
-		//console.logrequest.type);
+		//console.log(request.url);
+		//console.log(request.type);
 		request.url = request.url.replace(/intent=buy-new/g, 'intent=buy-used');
 		if(request.type == "popup")
 		{
@@ -24,11 +24,11 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		else if(request.type == "test")
 		{
-			//console.log"Connected!");
+			//console.log("Connected!");
 		}
 		else if((request.type == "categories") || (request.type == "category"))
 		{
-			//console.log"categories script started");
+			//console.log("categories script started");
 			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 41, message:"Categories...", url:request.url});
 			$.ajax({
 			  url: request.url,
@@ -36,14 +36,14 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  type: "GET",
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		//console.log"error");
+			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
 					message:"Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href='http://www.github.com/hawaiianchimp/kbb-craigslist/issues'>here</a>"});
 			  },
 			  success: function(data, responseText, jqXHR){
-			  		//console.log"categories sucess!");
+			  		//console.log("categories sucess!");
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-			  		//console.logextracted);
+			  		//console.log(extracted);
 		      		extracted.find("aside").remove();
 		      		//if(extracted.find(".selected"))
 		      		//extracted.find(".mod-category").not(".selected").remove();
@@ -69,8 +69,8 @@ chrome.runtime.onConnect.addListener(function(port) {
 			});
 		}
 		else if(request.type == "styles"){
-			//console.log"starting styles script");
-			//console.logrequest.url);
+			//console.log("starting styles script");
+			//console.log(request.url);
 			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 41, message:"Styles...", url:request.url});
 			$.ajax({
 			  url: request.url,
@@ -82,11 +82,11 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  		message:"Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href='http://www.github.com/hawaiianchimp/kbb-craigslist/issues'>here</a>"});
 				},
 			  success: function(data, responseText, jqXHR){
-			  		//console.logresponseText);
-			  		//console.logjqXHR);
-			  		//console.log"Styles Success!");
+			  		//console.log(responseText);
+			  		//console.log(jqXHR);
+			  		//console.log("Styles Success!");
 			  		var location = $($.parseHTML(data)).find("#Breadcrumbs").text().match(/>(\w+)$/m)[1].toLowerCase();
-			  		//console.loglocation);
+			  		//console.log(location);
 			  		if(location == "styles")
 			  		{
 				  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
@@ -111,20 +111,20 @@ chrome.runtime.onConnect.addListener(function(port) {
 							}
 							
 						});
-						//console.logrequest.type);
+						//console.log(request.type);
 						var type = (m=request.url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 						port.postMessage({url: request.url, kbb_data:request.kbb_data, data:$(extracted).html(), type:type});	
 						handleClick(port);
 					}
 					else{
-						//console.loglocation);
+						//console.log(location);
 						kbbAJAX({url: request.url, kbb_data:request.kbb_data, data:$(extracted).html(), type:location});
 					}
 			  }
 			});
 		}
 		else if(request.type == "options"){
-			//console.log"starting options script");
+			//console.log("starting options script");
 			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 51, message:"Choosing Options...", url:request.url});
 			$.ajax({
 			  url: request.url,
@@ -132,14 +132,14 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  type: "GET",
 			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		//console.log"error");
+			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
 					message:"Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href='http://www.github.com/hawaiianchimp/kbb-craigslist/issues'>here</a>"});
 			  },
 			  success: function(data, responseText, jqXHR){
-			  		//console.log"options success!");
+			  		//console.log("options success!");
 			  		var extracted = $($.parseHTML(data)).find(".mod-gradiated-content");
-			  		//console.logextracted);
+			  		//console.log(extracted);
 					$.each(extracted.find("a"), function(i,el){
 						var e = $(el);
 						e.attr("target","_BLANK");
@@ -164,7 +164,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			});
 		}
 		else if(request.type == "default"){
-			//console.log"starting default script");
+			//console.log("starting default script");
 			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 100, message:"Getting Price...", url:request.url});
 			$.ajax({
 			  url: request.url,
@@ -172,7 +172,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  type: "GET",
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		//console.log"error");
+			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
 					message:"Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href='http://www.github.com/hawaiianchimp/kbb-craigslist/issues'>here</a>"});
 			  },
@@ -201,18 +201,18 @@ chrome.runtime.onConnect.addListener(function(port) {
 					});
 
 					$(document).ready(function(){
-						//console.logdocument);
+						//console.log(document);
 						carPriceInfo = 1;//eval("("+(st=(s=$($("#kbb-iframe").contents()[0]).find("script").text()).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "")+")");
-						//console.logcarPriceInfo);
+						//console.log(carPriceInfo);
 						port.postMessage({url:request.url, kbb_data:request.kbb_data, data:$(document).find("body").html(), img:extracted.html(), type:request.type});
 					});
-					cars.push({info:request.kbb_data, price:carPriceInfo});
+					cars.push([{info:request.kbb_data, price:carPriceInfo}]);
 					handleClick(port);
 			  }
 			});
 		}
 		else if(request.type == "condition"){
-			//console.log"starting condition script");
+			//console.log("starting condition script");
 			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
 			request.kbb_data["pricetype"] = pricetype;
 			port.postMessage({kbb_data: request.kbb_data, type:"status", progress: 61, message:"Selecting Condition...", url:request.url});
@@ -222,7 +222,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  type: "GET",
 			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		//console.log"error");
+			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
 					message:"Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href='http://www.github.com/hawaiianchimp/kbb-craigslist/issues'>here</a>"});
 			  },
@@ -249,13 +249,13 @@ chrome.runtime.onConnect.addListener(function(port) {
 					});
 					handleClick(port);
 					var url = $(extracted).find(".btn-main-cta").first().attr("href");
-					//console.log"url:" + url);
+					//console.log("url:" + url);
 					var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 			  		kbbAJAX({url:url,kbb_data:request.kbb_data, data:$(extracted).html(), type:type});
 			  }
 			});
 		}else{
-			//console.log"starting else script");
+			//console.log("starting else script");
 			pricetype = (port.sender.url.match(/(cto|ctd)/)[0] == "cto")?"private-party":"retail";
 			request.kbb_data["pricetype"] = pricetype;
 			$.ajax({
@@ -264,7 +264,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		      type: "GET",
 		      data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
-			  		//console.log"error");
+			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
 					message:"Error with Kelley Blue Book <a class='btn btn-primary' href='"+request.url+"'>Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href='http://www.github.com/hawaiianchimp/kbb-craigslist/issues'>here</a>"});
 			  },
@@ -304,17 +304,17 @@ chrome.runtime.onConnect.addListener(function(port) {
 
 var handleClick = function(port){
 			$(".kbb-link").on('click', function(e){
-				//console.loge);
+				//console.log(e);
 				e.preventDefault();
 				var url = $(this).attr("href");
 				var type = (m=$(this).attr("href").match(/(styles|options|categories)/))?m[0]:"default";
-				//console.logurl);
-				//console.logtype);
+				//console.log(url);
+				//console.log(type);
 				port.postMessage({type:type, url: url, kbb_data: kbb_data, type:request.type});
 				port.onMessage.addListener(function(response) {
-					//console.logresponse);
+					//console.log(response);
 					$("#kbb").html(response.data);
-				//console.log"returned");
+				//console.log("returned");
 				});
 			});
 };

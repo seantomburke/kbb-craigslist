@@ -2,7 +2,7 @@
 	port.postMessage({type:"test",connection: "Connected!"});
 	// $.each($("#Browse-make .UsedCarmakes ul li a"), 
 	// 	function(i,e){
-	// 		//console.log$(e));
+	// 		//console.log($(e));
 	// });
 
 	// if(l=$(".postingtitle").text().match(/\$([\d,]+)/))
@@ -44,7 +44,7 @@
 			e = $(el).text().split(":");
 			if(typeof e[1] !== 'undefined'){
 				carInfo[e[0].trim()] = e[1].trim();
-				//console.log"carInfo['"+e[0].trim()+"'] = "+e[1].trim());
+				//console.log("carInfo['"+e[0].trim()+"'] = "+e[1].trim());
 			}			
 			else{
 				carInfo["car"] = e[0];
@@ -52,26 +52,26 @@
 				carInfo["make"] = ((b = e[0].match(/(Acura|Alfa Romeo|Aston Martin|Audi|Bentley|BMW|Buick|Cadillac|Chevrolet|Chrysler|Daewoo|Dodge|Eagle|Ferrari|FIAT|Fisker|Ford|Geo|GMC|Honda|HUMMER|Hyundai|Infinit(i|y)|Isuzu|Jaguar|Jeep|Kia|Lamborghini|Land Rover|Lexus|Lincoln|Lotus|Maserati|Maybach|Mazda|McLaren|Mercedes((-| )Benz)?|Mercury|MINI|Mitsubishi|Nissan|Oldsmobile|Panoz|Plymouth|Pontiac|Porsche|Ram|Rolls-Royce|Saab|Saturn|Scion|smart|SRT|Subaru|Suzuki|Tesla|Toyota|Volkswagen|Volvo)/i)) != null) ? b[0]:null;
 				var year = new RegExp(carInfo["year"],"g");
 				carInfo["model"] = e[0].replace(year, "").replace(carInfo["make"],"").trim().split(" ")[0];
-				//console.log"carInfo['car'] = "+e[0].trim());
+				//console.log("carInfo['car'] = "+e[0].trim());
 			}
 	});
 	var found = "searching";
-	//console.log"before", carInfo['condition']);
+	//console.log("before", carInfo['condition']);
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['excellent']) > 0) ? 'excellent':carInfo['condition'];
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['very good']) > 0) ? 'very good':carInfo['condition'];
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['good']) > 0) ? 'good':carInfo['condition'];
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['fair']) > 0) ? 'fair':carInfo['condition'];
-	//console.log"after", carInfo['condition']);
+	//console.log("after", carInfo['condition']);
 
 	if(!carInfo["model"])
 	{
 		var regex = new RegExp(carInfo["car"].trim() + "\\s(\\w+)\\s");
-		//console.logregex);
+		//console.log(regex);
 		var title = $(".postingtitle").text().match(regex);
-		//console.logtitle);
+		//console.log(title);
 		if(title && title.length > 1)
 			carInfo["model"] = title[1];
-		//console.logcarInfo["model"]);
+		//console.log(carInfo["model"]);
 	}
 
 	if(!carInfo["odometer"]){
@@ -79,9 +79,9 @@
 		var temp1 = (mtch1)?mtch1[1].replace(/k/,"000").replace(/,/,"").replace(/xxx/, "000"):carInfo["odometer"];
 		var mtch2 = $("#postingbody").text().match(/[^\$0-9](\d{2,3}(,| )?(000|k|xxx|\d{3}))/);
 		var temp2 = (mtch2)?mtch2[1].replace(/k/,"000").replace(/,/,"").replace(/xxx/, "000"):carInfo["odometer"];
-		//console.logtemp1, ">", temp2);
+		//console.log(temp1, ">", temp2);
 		carInfo["odometer"] = (temp1 > temp2) ? temp1:temp2;
-		//console.logcarInfo["odometer"]);
+		//console.log(carInfo["odometer"]);
 	}
 
 	listPrice = Number((l=$(".postingtitle").text().match(/\$([\d,]+)/))?l[1].replace(/k/,"000"):0);
@@ -118,7 +118,7 @@
 	conv('condition','condition');
 	kbb_data["mileage"]=((n=kbb_data["mileage"]) && n.length <= 3)? (n*1000):n;
 	$(document).ready(function(){$("#" + found + "KBB").insertAfter("#kbb-frame");})
-	//console.logkbb_data["mileage"]);
+	//console.log(kbb_data["mileage"]);
 
 	//kbb_data['mileage'])?(m=carInfo["odometer"]):0;
 	//bx = (b=kbb_data['bodystyle'])?(b=carInfo["type"]):0;
@@ -128,7 +128,7 @@
 
 
 	var url = ("http://www.kbb.com/"+carInfo["make"]+"/"+carInfo["model"]+"/"+carInfo["year"]+"-"+carInfo["make"]+"-"+carInfo["model"]+"/styles/").replace(/ /g,"-");
-	//console.logurl + "?" + serialize(kbb_data));
+	//console.log(url + "?" + serialize(kbb_data));
 	//$("head").prepend($("<base>").attr("href","http://www.kbb.com/"));
 	var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 	port.postMessage({type:type, url: url, kbb_data: kbb_data, carInfo: carInfo});
@@ -167,16 +167,16 @@
 	//       }
 	//     });
 
-	//console.log"http://www.seantburke.com/");
+	//console.log("http://www.seantburke.com/");
 	var handleClick = function(port){
 				$(".kbb-link").on('click', function(e){
-					//console.loge);
+					//console.log(e);
 					e.preventDefault();
 					$("#kbb-progress").slideDown();
 					var url = $(this).attr("href");
 					var type = (m=$(this).attr("href").match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
-					//console.logurl);
-					//console.logtype);
+					//console.log(url);
+					//console.log(type);
 					port.postMessage({type:type, url: url, kbb_data: kbb_data});
 					port.onMessage.addListener(handleResponse);
 				});
@@ -185,26 +185,28 @@
 
 	var handleForm = function(port){
 		$("#kbb-submit").on('click', function(e){
-			//console.loge);
+			//console.log(e);
 			e.preventDefault();
 			var url = ("http://www.kbb.com/"+ $("#kbb-make").val() +"/"+$("#kbb-model").val()+"/"+$("#kbb-year").val()+"-"+$("#kbb-make").val()+"-"+$("#kbb-model").val()+"/styles/?intent=buy-used&mileage=" + $("#kbb-mileage").val()).replace(/ /g,"-");
 			var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 			$("#kbb-progress").slideDown("slow");
-			//console.logurl);
-			//console.logtype);
+			//console.log(url);
+			//console.log(type);
 			port.postMessage({type:type, url: url, kbb_data: kbb_data});
 			port.onMessage.addListener(handleResponse);
 		})
 	}
 
 	var handleResponse = function(response) {
-		//console.logresponse);
+		//console.log(response);
 		if(response.type == "default"){
-			//console.log"This is the Default type");
-			//console.logresponse);
-			carPriceInfo = "("+(st=(s=response.data).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, "").replace(/&quot;/g,"'")+")";
-			d=eval(carPriceInfo);
-			//console.logd);
+			//console.log("This is the Default type");
+			//console.log(response);
+			var temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,]+)(vehicleId:)([\s&.\w;,:\-\|\{\}\[\]]+)\);/);
+			carPriceInfo = ("{ "+temp_json.splice(3,4).join(" ")).replace(/&quot;/g,"'");
+			//console.log(carPriceInfo);
+			d=eval("("+carPriceInfo+")");
+			//console.log(d);
 
 
 			kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
@@ -302,8 +304,8 @@
 		}
 		else if(response.type == "status")
 		{
-			//console.logresponse.message);
-			//console.logresponse.kbb_data);
+			//console.log(response.message);
+			//console.log(response.kbb_data);
 			$("#kbb-progress .progress-bar").attr("aria-valuenow", response.progress);
 			$("#kbb-progress .progress-bar").css("width", response.progress + "%");
 			$("#kbb-progress .progress-bar").text(response.message);
@@ -311,8 +313,8 @@
 		}
 		else if(response.type == "error")
 		{
-			//console.logresponse.message);
-			//console.logresponse.kbb_data);
+			//console.log(response.message);
+			//console.log(response.kbb_data);
 			makeDropdowns(function(){
 					// $("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
 					// $("#kbb-progress .progress-bar").css("width", 100 + "%");
@@ -343,13 +345,13 @@
 		}
 		else
 		{
-			//console.log"Type is:" + response.type);
+			//console.log("Type is:" + response.type);
 			$("#kbb-progress").slideUp("normal", function(){});
 			$("#kbb").hide().html(response.data).fadeIn("slow");
 			$("#kbb").append($("<a>", {href:response.url,class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
 			handleClick(port);
 		}
-	//console.log"returned");
+	//console.log("returned");
 	};
 
 	var makeDropdowns = function(callback){
@@ -379,7 +381,7 @@
 		  		$("#kbb").hide().html(form).fadeIn("slow");
 			},
 			success: function(data, responseText, jqXHR){
-				//console.logdata);
+				//console.log(data);
 				var form = $("<form>",{id:"kbb-form"});
 				form.append($("<select>",{"id":"kbb-year", "name":"year","value":kbb_data["year"]}));
 				form.append($("<select>",{"id":"kbb-make", "name":"make","value":kbb_data["make"]}));
