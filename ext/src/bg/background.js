@@ -17,7 +17,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 	port.onMessage.addListener(function kbbAJAX(request) {
 		//console.log(request.url);
 		//console.log(request.type);
-		request.url = request.url.replace(/intent=buy-new/g, 'intent=buy-used');
+		if(request.url && request.url.length > 0){
+			request.url = request.url.replace(/intent=buy-new/g, 'intent=buy-used');
+		}
 		if(request.type == "popup")
 		{
 			port.postMessage({cars:cars, type:"popup"});
@@ -25,6 +27,10 @@ chrome.runtime.onConnect.addListener(function(port) {
 		else if(request.type == "test")
 		{
 			//console.log("Connected!");
+		}
+		else if(request.type == "kbb-price"){
+			//console.log(request.data);
+				port.postMessage({type:"kbb-background", kbb_data: request.data});
 		}
 		else if((request.type == "categories") || (request.type == "category"))
 		{
@@ -318,6 +324,7 @@ var handleClick = function(port){
 				});
 			});
 };
+
 
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),

@@ -202,105 +202,118 @@
 		if(response.type == "default"){
 			//console.log("This is the Default type");
 			//console.log(response);
-			var temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,]+)(vehicleId:)([\s&.\w;,:\-\|\{\}\[\]]+)\);/);
-			carPriceInfo = ("{ "+temp_json.splice(3,4).join(" ")).replace(/&quot;/g,"'");
-			//console.log(carPriceInfo);
-			d=eval("("+carPriceInfo+")");
-			//console.log(d);
+		//console.log("temp_json", response.data);
+			var temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,\"\/\.]+)(vehicleId:)([\"\s&.\w;,:\-\|\{\}\[\]]+)\);/g);
+		//console.log("temp_json", temp_json);
+			if(temp_json && temp_json.length > 0){
+				carPriceInfo = ("{ "+temp_json.splice(3,4).join(" ")).replace(/&quot;/g,"'");
+				//console.log(carPriceInfo);
+				d=eval("("+carPriceInfo+")");
+				//console.log(d);
 
 
-			kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
+				kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
 
-			if(kbb_price[carInfo['condition']]){
-				current_price = kbb_price[carInfo['condition']];
-			}
+				if(kbb_price[carInfo['condition']]){
+					current_price = kbb_price[carInfo['condition']];
+				}
+				else{
+					current_price = kbb_price['fair'];
+				}
+				var cd;
+				var current_class = (cd=carInfo['condition']) ? cd.replace(/\s/,""): "fair";
+				priceLabel = "Kbb Price: <span class='"+current_class+"'>" + current_price.toMoney() + "</span>";
+				$("#kbb").hide().html($(response.img)).fadeIn("slow");
+				$("#kbb").prepend($("<h2>Mileage: "+ Number(d.mileage).toMiles()+"<h2>"));
+				$("#kbb").prepend($("<h2>", {
+					id: "carInfo"
+				}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
+				$("#kbb").append($("<h1>", {
+					id: "price",
+					class: "priceInfo"
+				}).html(priceLabel).hide().fadeIn("slow"));
+				var priceDiffLabel;
+
+				if(listPrice > current_price)
+				{
+					priceDiffLabel = "<span class='red'>"+ listPrice.toMoney() +"</span> <br><small class='red'>"+ (listPrice - current_price).toMoney() +" overpriced</small></h1>";
+				}
+				else{
+					priceDiffLabel = "<span class='green'>"+ listPrice.toMoney() +"</span> <br><small class='green'>"+ (current_price - listPrice).toMoney() +" underpriced</small></h1>";
+				}
+				priceDiffLabel = "List Price: "+ priceDiffLabel;
+				$("#kbb").append($("<h1>", {
+					id: "price",
+					class: "priceInfo"
+				}).html(priceDiffLabel).hide().fadeIn("slow"));
+
+				var table = $("<table class='table table-hover'>");
+				table.append("<thead><tr><th colspan='2'><h2>Kelley Blue Book Prices</h2></th></tr></thead>");
+				var color_class = (current_class == 'excellent') ? current_class + " success":" ";
+				var tr = $("<tr class='"+color_class+"'><td id='priceexcellent' class='priceInfo'>Excellent:</td><td>" + d.data.values.privatepartyexcellent.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
+				table.append(tr);
+				color_class = (current_class == 'verygood') ? current_class + " success":" ";
+				var tr = $("<tr class='"+color_class+"'><td id='priceverygood' class='priceInfo'>Very Good:</td><td>" + d.data.values.privatepartyverygood.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
+				table.append(tr);
+				color_class = (current_class == 'good') ? "warning":" ";
+				var tr = $("<tr class='"+color_class+"'><td id='pricegood' class='priceInfo'>Good:</td><td>" + d.data.values.privatepartygood.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
+				table.append(tr);
+				color_class = (current_class == 'fair') ? current_class + " danger":" ";
+				var tr = $("<tr class='"+color_class+"'><td id='pricefair' class='priceInfo'>Fair:</td><td>" + d.data.values.privatepartyfair.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
+				table.append(tr);
+				$("#kbb").append(table);
+
+				//canvas
+				$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
+				$("#kbb-price-canvas").html('<img id="kbblogo" src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png') +'"/><canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
+				drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
+
+			}		
 			else{
-				current_price = kbb_price['fair'];
+
+				// $("#kbb").append($("<h2>", {
+				// 	id: "priceexcellent",
+				// 	class: "priceInfo excellent"
+				// }).html("Excellent: $" + d.data.values.privatepartyexcellent.price).hide().fadeIn("slow"));
+				// $("#kbb").append($("<h2>", {
+				// 	id: "priceverygood",
+				// 	class: "priceInfo verygood"
+				// }).html("Very Good: $" + d.data.values.privatepartyverygood.price).hide().fadeIn("slow"));
+				// $("#kbb").append($("<h2>", {
+				// 	id: "pricegood",
+				// 	class: "priceInfo good"
+				// }).html("Good: $" + d.data.values.privatepartygood.price).hide().fadeIn("slow"));
+				// $("#kbb").append($("<h2>", {
+				// 	id: "pricefair",
+				// 	class: "priceInfo fair"
+				// }).html("Fair: $" + d.data.values.privatepartyfair.price).hide().fadeIn("slow"));
+
+				// var perc = (d.data.values.fpp.price-d.data.values.fpp.priceMin)/(d.data.values.fpp.priceMax-d.data.values.fpp.priceMin)*100;
+				// $("#kbb").append($("<div>",{class:"row"}).html(
+				// 	'<div class="col-xs-2">'+
+				// 	'<span class="label label-success">'+d.data.values.fpp.priceMin.toMoney()+'</span>'+
+				// 	'</div><div class="col-xs-7">'+
+				// 	'<div class="progress">'+
+				// 	'<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="width:'+perc+'%;">$'+d.data.values.fpp.price+'</div></div></div>'+
+				// 	'<div class="col-xs-1">'+
+				// 	'<span class="label label-danger">'+d.data.values.fpp.priceMax.toMoney()+'</span>'+
+				// 	'</div>'
+				// 	).hide().fadeIn("slow"));
+
+				var new_url = response.url.replace(/pricetype=(retail|trade-in)/, "pricetype=private-party");
+				$("#kbb").html("<div class='alert alert-warning'><h3>Attempting to call KBB.com...</h3><p>KBB has changed or blocked access to their pricing information. Sit tight while we attept to retrieve KBB's market meter or Click on this link to view the price on their site: <br><a href='"+new_url+"'>"+(new_url).substring(0,50) + "..." +"</a></p></div>");	
+
+				$("#kbb").append($("<iframe>", {id: "priceiFrame"}));
+				$("#priceiFrame").attr({"src":new_url, "scrolling":"no"});
 			}
-			var cd;
-			var current_class = (cd=carInfo['condition']) ? cd.replace(/\s/,""): "fair";
-			priceLabel = "Kbb Price: <span class='"+current_class+"'>" + current_price.toMoney() + "</span>";
-			$("#kbb").hide().html($(response.img)).fadeIn("slow");
-			$("#kbb").prepend($("<h2>Mileage: "+ Number(d.mileage).toMiles()+"<h2>"));
-			$("#kbb").prepend($("<h2>", {
-				id: "carInfo"
-			}).html(d.year + " " + d.manufacturer + " " + d.model + " " + d.style));
-			$("#kbb").append($("<h1>", {
-				id: "price",
-				class: "priceInfo"
-			}).html(priceLabel).hide().fadeIn("slow"));
-			var priceDiffLabel;
-
-			if(listPrice > current_price)
-			{
-				priceDiffLabel = "<span class='red'>"+ listPrice.toMoney() +"</span> <br><small class='red'>"+ (listPrice - current_price).toMoney() +" overpriced</small></h1>";
-			}
-			else{
-				priceDiffLabel = "<span class='green'>"+ listPrice.toMoney() +"</span> <br><small class='green'>"+ (current_price - listPrice).toMoney() +" underpriced</small></h1>";
-			}
-			priceDiffLabel = "List Price: "+ priceDiffLabel;
-			$("#kbb").append($("<h1>", {
-				id: "price",
-				class: "priceInfo"
-			}).html(priceDiffLabel).hide().fadeIn("slow"));
-
-			var table = $("<table class='table table-hover'>");
-			table.append("<thead><tr><th colspan='2'><h2>Kelley Blue Book Prices</h2></th></tr></thead>");
-			var color_class = (current_class == 'excellent') ? current_class + " success":" ";
-			var tr = $("<tr class='"+color_class+"'><td id='priceexcellent' class='priceInfo'>Excellent:</td><td>" + d.data.values.privatepartyexcellent.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
-			table.append(tr);
-			color_class = (current_class == 'verygood') ? current_class + " success":" ";
-			var tr = $("<tr class='"+color_class+"'><td id='priceverygood' class='priceInfo'>Very Good:</td><td>" + d.data.values.privatepartyverygood.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
-			table.append(tr);
-			color_class = (current_class == 'good') ? "warning":" ";
-			var tr = $("<tr class='"+color_class+"'><td id='pricegood' class='priceInfo'>Good:</td><td>" + d.data.values.privatepartygood.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
-			table.append(tr);
-			color_class = (current_class == 'fair') ? current_class + " danger":" ";
-			var tr = $("<tr class='"+color_class+"'><td id='pricefair' class='priceInfo'>Fair:</td><td>" + d.data.values.privatepartyfair.price.toMoney() + "</td></tr>").hide().fadeIn("slow");
-			table.append(tr);
-			$("#kbb").append(table);
-
-			//canvas
-			$("#kbb").append($("<div>", {id: "kbb-price-canvas"}));
-			$("#kbb-price-canvas").html('<img id="kbblogo" src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png') +'"/><canvas id="mainCanvas" width="260" height="220"></canvas><div style="display: none"><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240.png')+'" width="1" height="1" alt="Preload of images/logo240.png" /><img src="'+ chrome.extension.getURL('/src/inject/webcode/images/logo240_2x.png')+'"" width="1" height="1" alt="Preload of images/logo240_2x.png" /></div>');
-			drawCanvas('mainCanvas', {kbb:d, listPrice:listPrice});
-
-			//$("#priceiFrame").attr("src", response.url);
-			// $("#kbb").append($("<h2>", {
-			// 	id: "priceexcellent",
-			// 	class: "priceInfo excellent"
-			// }).html("Excellent: $" + d.data.values.privatepartyexcellent.price).hide().fadeIn("slow"));
-			// $("#kbb").append($("<h2>", {
-			// 	id: "priceverygood",
-			// 	class: "priceInfo verygood"
-			// }).html("Very Good: $" + d.data.values.privatepartyverygood.price).hide().fadeIn("slow"));
-			// $("#kbb").append($("<h2>", {
-			// 	id: "pricegood",
-			// 	class: "priceInfo good"
-			// }).html("Good: $" + d.data.values.privatepartygood.price).hide().fadeIn("slow"));
-			// $("#kbb").append($("<h2>", {
-			// 	id: "pricefair",
-			// 	class: "priceInfo fair"
-			// }).html("Fair: $" + d.data.values.privatepartyfair.price).hide().fadeIn("slow"));
-
-			// var perc = (d.data.values.fpp.price-d.data.values.fpp.priceMin)/(d.data.values.fpp.priceMax-d.data.values.fpp.priceMin)*100;
-			// $("#kbb").append($("<div>",{class:"row"}).html(
-			// 	'<div class="col-xs-2">'+
-			// 	'<span class="label label-success">'+d.data.values.fpp.priceMin.toMoney()+'</span>'+
-			// 	'</div><div class="col-xs-7">'+
-			// 	'<div class="progress">'+
-			// 	'<div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="60" aria-valuemin="'+d.data.values.fpp.priceMin+'" aria-valuemax="'+d.data.values.fpp.priceMax+'" aria-valuenow="'+d.data.values.fpp.price+'" style="width:'+perc+'%;">$'+d.data.values.fpp.price+'</div></div></div>'+
-			// 	'<div class="col-xs-1">'+
-			// 	'<span class="label label-danger">'+d.data.values.fpp.priceMax.toMoney()+'</span>'+
-			// 	'</div>'
-			// 	).hide().fadeIn("slow"));		
 
 			$("#kbb").append($("<a>", {href:response.url ,class:"btn btn-primary", target: "_BLANK"}).html("Open in KBB.com").hide().fadeIn("slow"));	
 			handleClick(port);
 			$("#kbb-progress").slideUp("fast", function(){
-						$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
-						$("#kbb-progress .progress-bar").css("width", 0 + "%");
-					});
+				$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
+				$("#kbb-progress .progress-bar").css("width", 0 + "%");
+			});
+
 		}
 		else if(response.type == "status")
 		{
@@ -453,3 +466,21 @@
 			}
 		});
 	};
+
+port.onMessage.addListener(handleKBB);
+
+function handleKBB(response){
+//console.log("handling kbb");
+	if(response.type == "kbb-background")
+	{
+	//console.log(response.message);
+	//console.log(response.kbb_data);
+
+		$("#kbb").append($("<div class='kbb-price'>"+ response.kbb_data +"</div>").hide().fadeIn("slow"));	
+		handleClick(port);
+		$("#kbb-progress").slideUp("fast", function(){
+			$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
+			$("#kbb-progress .progress-bar").css("width", 0 + "%");
+		});
+	}
+}

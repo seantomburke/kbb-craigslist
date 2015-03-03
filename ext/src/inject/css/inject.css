@@ -9,7 +9,7 @@
 	border-style: solid;
 	padding: 10px;
 	margin-bottom: 20px;
-	min-width: 300px;
+	min-width: 340px;
 	max-width: 500px;
 	-webkit-border-radius: 5px;
 	font-family: 'Bitstream Vera Serif', 'Times New Roman', serif;
@@ -34,6 +34,13 @@ font-weight: bold;
 
 #kbb-frame #kbb-iframe{
 	overflow: hidden;
+}
+
+#kbb #priceiFrame{
+	overflow: hidden;
+	width: 300px;
+	height: 280px;
+	margin-bottom: 20px;
 }
 
 #kbb-frame #mainCanvas{
@@ -130,6 +137,10 @@ font-weight: bold;
 	display: block;
 }
 
+#kbb-frame .vehicle-styles-container:last-child{
+	display: none;
+}
+
 #kbb-frame .excellent{
 	color: #009900;
 }
@@ -179,6 +190,14 @@ font-weight: bold;
 }
 
 #kbb-frame .not-sure{
+	display: none;
+}
+
+#kbb-frame .pilot-banner{
+	display: none;
+}
+
+#kbb-frame .pilot-content{
 	display: none;
 }
 
