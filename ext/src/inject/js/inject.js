@@ -203,7 +203,7 @@
 			//console.log("This is the Default type");
 			//console.log(response);
 		//console.log("temp_json", response.data);
-			var temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,\"\/\.]+)(vehicleId:)([\"\s&.\w;,:\-\|\{\}\[\]]+)\);/g);
+			var temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,\"\/\.]+)(vehicleId:)([\"\s&.\w;,:\-\|\{\}\[\]]+)\);/);
 		//console.log("temp_json", temp_json);
 			if(temp_json && temp_json.length > 0){
 				carPriceInfo = ("{ "+temp_json.splice(3,4).join(" ")).replace(/&quot;/g,"'");

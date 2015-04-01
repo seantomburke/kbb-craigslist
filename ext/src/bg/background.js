@@ -176,7 +176,6 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  url: request.url,
 			  dataType: "html",
 			  type: "GET",
-			  data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
