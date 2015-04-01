@@ -48,7 +48,7 @@
 			}			
 			else{
 				carInfo["car"] = e[0];
-				carInfo["year"] = e[0].match(/(19|20)[0-9]{2}/)[0];
+				carInfo["year"] = (p=e[0].match(/(19|20)[0-9]{2}/))? p[0]:null;
 				carInfo["make"] = ((b = e[0].match(/(Acura|Alfa Romeo|Aston Martin|Audi|Bentley|BMW|Buick|Cadillac|Chevrolet|Chrysler|Daewoo|Dodge|Eagle|Ferrari|FIAT|Fisker|Ford|Geo|GMC|Honda|HUMMER|Hyundai|Infinit(i|y)|Isuzu|Jaguar|Jeep|Kia|Lamborghini|Land Rover|Lexus|Lincoln|Lotus|Maserati|Maybach|Mazda|McLaren|Mercedes((-| )Benz)?|Mercury|MINI|Mitsubishi|Nissan|Oldsmobile|Panoz|Plymouth|Pontiac|Porsche|Ram|Rolls-Royce|Saab|Saturn|Scion|smart|SRT|Subaru|Suzuki|Tesla|Toyota|Volkswagen|Volvo)/i)) != null) ? b[0]:null;
 				var year = new RegExp(carInfo["year"],"g");
 				carInfo["model"] = e[0].replace(year, "").replace(carInfo["make"],"").trim().split(" ")[0];
@@ -185,13 +185,17 @@
 
 	var handleForm = function(port){
 		$("#kbb-submit").on('click', function(e){
-			//console.log(e);
+			console.log(e);
 			e.preventDefault();
-			var url = ("http://www.kbb.com/"+ $("#kbb-make").val() +"/"+$("#kbb-model").val()+"/"+$("#kbb-year").val()+"-"+$("#kbb-make").val()+"-"+$("#kbb-model").val()+"/styles/?intent=buy-used&mileage=" + $("#kbb-mileage").val()).replace(/ /g,"-");
+			carInfo["car"] = $("#kbb-year").val()+"-"+$("#kbb-make").val()+"-"+$("#kbb-model").val();
+			carInfo["year"] = $("#kbb-year").val();
+			carInfo["make"] = $("#kbb-make").val();
+			carInfo["model"] = $("#kbb-model").val();
+			var url = ("http://www.kbb.com/"+ carInfo["make"] +"/"+carInfo["model"]+"/"+carInfo["car"]+"/styles/?intent=buy-used&mileage=" + $("#kbb-mileage").val()).replace(/ /g,"-");
 			var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 			$("#kbb-progress").slideDown("slow");
-			//console.log(url);
-			//console.log(type);
+			console.log(url);
+			console.log(type);
 			port.postMessage({type:type, url: url, kbb_data: kbb_data});
 			port.onMessage.addListener(handleResponse);
 		})
@@ -335,12 +339,21 @@
 						$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
 						$("#kbb-progress .progress-bar").css("width", 0 + "%");
 					});
-					$("#kbb").prepend($("<div class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message).fadeIn("slow"));
+					$("#kbb").prepend($("<div id='error-box' class='alert alert-danger' role='alert'>Error with Kelley Blue Book <a target='_BLANK' class='btn btn-primary' href='"+response.url+"'>Visit KBB.com</a></div>").hide().html(response.message+"<br>").fadeIn("slow"));
+					$("#error-box").append("<div class='timer-warning'>");
+					setTimeout(function(){
+						var warning_message = "Opening kbb.com in background tab";
+						$(".timer-warning").html('<div id="kbb-progress" class="progress"><div class="progress-bar progress-bar-danger progress-bar-striped active"  role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">'+warning_message+'</div></div>').hide().fadeIn("slow");
+					}, 500);
 				});
+			setTimeout(function(){
+				$(".timer-warning").hide();
+				window.open(response.url,'_BLANK');
+			}, 4000); 
 			
 		}
 		else if(response.type == "init_error"){
-			if(carInfo["year"] < 1994){
+			if(carInfo["year"] && (carInfo["year"] < 1994)){
 				makeDropdowns(function(){
 				// 	$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
 				// 	$("#kbb-progress .progress-bar").css("width", 100 + "%");
@@ -353,7 +366,16 @@
 				
 			}
 			else{
-				makeDropdowns();
+				makeDropdowns(function(){
+				// 	$("#kbb-progress .progress-bar").attr("aria-valuenow", 100);
+				// 	$("#kbb-progress .progress-bar").css("width", 100 + "%");
+					$("#kbb-progress").slideUp("normal", function(){
+						$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
+						$("#kbb-progress .progress-bar").css("width", 0 + "%");
+					});
+					$("#kbb").prepend($("<div>").hide().html("<div class='alert alert-warning' role='alert'>Sorry. The information provided for this car could not be found on Kelley Blue Book</div>").fadeIn("slow"));
+				});
+
 			}
 		}
 		else
@@ -377,30 +399,36 @@
 				yearid: carInfo["year"]
 			},
 			error: function(jqXHR, textStatus, errorThrown){
-				var form = $("<form>",{id:"kbb-form"});
-		  		form.append($("<select>",{"id":"kbb-make", "type":"text", "name":"make","value":kbb_data["make"]}));
-		  		form.append($("<select>",{"id":"kbb-model", "type":"text", "name":"model","value":kbb_data["model"]}));
-		  		form.append($("<select>",{"id":"kbb-year", "type":"text", "name":"year","value":kbb_data["year"]}));
-		  		form.append($("<select>",{"id":"kbb-mileage", "type":"text", "name":"mileage","value":kbb_data["mileage"]}));
-		  		form.append($("<select>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
-		  		for(var i=0; i<data.length; i++){
-					var option = document.createElement("option");
-					option.text = jsonData[i].Name;
-					$('#kbb-make')[0].add(option);
-				}
-				$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
-				$("#kbb-progress .progress-bar").css("width", 0 + "%");
-				$("#kbb-progress").slideUp("normal");
-		  		$("#kbb").hide().html(form).fadeIn("slow");
+		  		$("#kbb").hide().html("Error Retrieving Makes and Models from KBB").fadeIn("slow");
 			},
 			success: function(data, responseText, jqXHR){
 				//console.log(data);
-				var form = $("<form>",{id:"kbb-form"});
-				form.append($("<select>",{"id":"kbb-year", "name":"year","value":kbb_data["year"]}));
-				form.append($("<select>",{"id":"kbb-make", "name":"make","value":kbb_data["make"]}));
-				form.append($("<select>",{"id":"kbb-model", "name":"model","value":kbb_data["model"]}));
-				form.append($("<input>",{"id":"kbb-mileage","type":"text", "name":"mileage","value":kbb_data["mileage"], "placeholder":"Mileage"}));
-				form.append($("<input>",{"id":"kbb-submit", "type":"button", "name":"submit","value":"submit"}));
+				var form = $("<form >",{class:"form-inline", id:"kbb-form"});
+				var kbb_year_group = $("<div class='form-group' id='kbb-year-group'>");
+				var kbb_make_group = $("<div class='form-group' id='kbb-make-group'>");
+				var kbb_model_group = $("<div class='form-group' id='kbb-model-group'>");
+				var kbb_mileage_group = $("<div class='form-group' id='kbb-mileage-group'>");
+				
+
+				kbb_year_group.append($("<label class='sr-only' for='kbb-year'>Year</label>"));
+				kbb_year_group.append($("<select>",{"class":"form-control", "id":"kbb-year", "name":"year","value":kbb_data["year"]}));
+				
+				kbb_make_group.append($("<label class='sr-only' for='kbb-make'>Make</label>"));
+				kbb_make_group.append($("<select>",{"class":"form-control", "id":"kbb-make", "name":"make","value":kbb_data["make"]}));
+				
+				kbb_model_group.append($("<label class='sr-only' for='kbb-model'>Model</label>"));
+				kbb_model_group.append($("<select>",{"class":"form-control", "id":"kbb-model", "name":"model","value":kbb_data["model"]}));
+				
+				kbb_mileage_group.append($("<label class='sr-only' for='kbb-mileage'>Mileage</label>"));
+				kbb_mileage_group.append($("<input>",{"class":"form-control", "id":"kbb-mileage","type":"text", "name":"mileage","value":kbb_data["mileage"], "placeholder":"Mileage"}));
+				
+
+				form.append(kbb_year_group);
+				form.append(kbb_make_group);
+				form.append(kbb_model_group);
+				form.append(kbb_mileage_group);
+
+				form.append($("<input>",{"class":"form-control btn btn-primary", "id":"kbb-submit", "type":"button", "name":"submit","value":"Submit"}));
 
 				$("#kbb-progress .progress-bar").attr("aria-valuenow", 0);
 				$("#kbb-progress .progress-bar").css("width", 0 + "%");
