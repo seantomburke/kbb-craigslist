@@ -1,8 +1,21 @@
 if(self==top){
 //console.log("not in iFrame");
+setInterval(function(){
+	console.log("self == top");
+	console.log("self  :", self.window.location.href);
+	console.log("parent:", parent.window.location.href);
+	console.log("top   :", top.window.location.href);
+}, 5000);
+
 }
 else if(parent == top){
-
+	
+	setInterval(function(){
+		console.log("parent == top");
+		console.log("self  :", self.window.location.href);
+		console.log("parent:", parent.window.location.href);
+		console.log("top   :", top.window.location.href);
+	}, 5000);
 
 	var js = document.createElement("script");
 	js.type = "text/javascript";

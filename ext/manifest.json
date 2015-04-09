@@ -123,24 +123,6 @@
       ],
       "all_frames": true,
       "run_at": "document_end"
-    },
-    {
-      "matches": [
-        "*://*.kbb.com/*"
-      ],
-      "css":[
-        "src/inject/css/kbb.css",
-        "src/inject/css/bootstrap-theme.min.css",
-        "src/inject/css/bootstrap.min.css"
-      ],
-      "js": [
-        "src/bg/libs/jquery/jquery-1.11.0.min.js",
-        "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
-        "src/bg/libs/bootstrap/bootstrap.min.js",
-        "src/inject/js/kbb.js"
-      ],
-      "all_frames": true,
-      "run_at": "document_end"
     }
   ]
 }

@@ -15,10 +15,11 @@ chrome.runtime.onConnect.addListener(function(port) {
 	console.assert(port.name == "kbb-port");
 	//console.log(port);
 	port.onMessage.addListener(function kbbAJAX(request) {
-		//console.log(request.url);
-		//console.log(request.type);
+
 		if(request.url && request.url.length > 0){
 			request.url = request.url.replace(/intent=buy-new/g, 'intent=buy-used');
+			request.url = removeDuplicateQueries(request.url, request.kbb_data);
+			console.log(request.url);
 		}
 		if(request.type == "popup")
 		{
@@ -40,7 +41,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  url: request.url,
 			  dataType: "html",
 			  type: "GET",
-			  data: request.kbb_data,
+			  //sih request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
@@ -119,7 +120,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 						});
 						//console.log(request.type);
 						var type = (m=request.url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
-						port.postMessage({url: request.url, kbb_data:request.kbb_data, data:$(extracted).html(), type:type});	
+						port.postMessage({url: request.url, kbb_data: request.kbb_data, data:$(extracted).html(), type:type});	
 						handleClick(port);
 					}
 					else{
@@ -241,7 +242,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  url: request.url,
 			  dataType: "html",
 			  type: "GET",
-			  data: request.kbb_data,
+			  //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
@@ -293,7 +294,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		      url: request.url,
 		      dataType: "html",
 		      type: "GET",
-		      data: request.kbb_data,
+		      //data: request.kbb_data,
 			  error: function(jqXHR, textStatus, errorThrown){
 			  		//console.log("error");
 					port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:"error", url:request.url,
@@ -350,6 +351,41 @@ var handleClick = function(port){
 			});
 };
 
+
+
+function removeDuplicateQueries(url, data){
+	if(url.length === 0){
+		return url;
+	}
+	
+	data = data || {};
+	var anchor = document.createElement("a");
+	anchor.href = url;
+	var search = anchor.search.substr(1);
+	console.log(search);
+	var urlInside = decodeURI(search.replace(/&/g, "\",\"").replace(/=/g,"\":\""));
+	console.log(urlInside);
+	var query = "";
+	if(urlInside){
+		var urlVars = JSON.parse('{"' + urlInside + '"}');
+		for(var i in urlVars)
+		{
+			data[i] = urlVars[i];
+		}
+		console.log(data);
+		query = "?" + serialize(data);
+	}  
+	return anchor.protocol + "//" +anchor.host + (anchor.pathname || "") + (anchor.hash || "") + query;
+}
+
+function serialize(obj) {
+  var str = [];
+  for(var p in obj)
+    if (obj.hasOwnProperty(p)) {
+      str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+    }
+  return str.join("&");
+}
 
 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
 (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
