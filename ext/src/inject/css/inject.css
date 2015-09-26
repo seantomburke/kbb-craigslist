@@ -216,3 +216,7 @@ font-weight: bold;
 #kbb-frame .includes-and-cta-container, #kbb-frame .also-standard, #kbb-frame .ad-label   {
 	display: none;
 }
+
+#kbb-frame .quick-view-overlay{
+	display: none !important;
+}
