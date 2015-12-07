@@ -127,9 +127,9 @@
 	//kbb_data['condition'] = carInfo["condition"];
 
 
-	var url = ("http://www.kbb.com/"+carInfo["make"]+"/"+carInfo["model"]+"/"+carInfo["year"]+"-"+carInfo["make"]+"-"+carInfo["model"]+"/styles/").replace(/ /g,"-");
+	var url = ("https://www.kbb.com/"+carInfo["make"]+"/"+carInfo["model"]+"/"+carInfo["year"]+"-"+carInfo["make"]+"-"+carInfo["model"]+"/styles/").replace(/ /g,"-");
 	//console.log(url + "?" + serialize(kbb_data));
-	//$("head").prepend($("<base>").attr("href","http://www.kbb.com/"));
+	//$("head").prepend($("<base>").attr("href","https://www.kbb.com/"));
 	var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 	port.postMessage({type:type, url: url, kbb_data: kbb_data, carInfo: carInfo});
 	port.onMessage.addListener(function(response){
@@ -160,7 +160,7 @@
 	// 				e.attr("target","_BLANK");
 	// 				e.attr("onclick", "");
 	// 				e.addClass("kbb-link");
-	// 				e.attr("href", "http://www.kbb.com" + e.attr("href"));
+	// 				e.attr("href", "https://www.kbb.com" + e.attr("href"));
 	// 			});
 	//       		$("#kbb").hide().html(extracted.html()).fadeIn("slow");
 	//       		handleClick(port);
@@ -191,7 +191,7 @@
 			carInfo["year"] = $("#kbb-year").val();
 			carInfo["make"] = $("#kbb-make").val();
 			carInfo["model"] = $("#kbb-model").val();
-			var url = ("http://www.kbb.com/"+ carInfo["make"] +"/"+carInfo["model"]+"/"+carInfo["car"]+"/styles/?intent=buy-used&mileage=" + $("#kbb-mileage").val()).replace(/ /g,"-");
+			var url = ("https://www.kbb.com/"+ carInfo["make"] +"/"+carInfo["model"]+"/"+carInfo["car"]+"/styles/?intent=buy-used&mileage=" + $("#kbb-mileage").val()).replace(/ /g,"-");
 			var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):"default";
 			$("#kbb-progress").slideDown("slow");
 			console.log(url);
@@ -391,7 +391,7 @@
 
 	var makeDropdowns = function(callback){
 		$.ajax({
-			url: 'http://www.kbb.com/jsdata/_makesmodels',
+			url: 'https://www.kbb.com/jsdata/_makesmodels',
 			dataType: "json",
 			type: "GET",
 			data: {
