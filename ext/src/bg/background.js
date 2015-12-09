@@ -268,9 +268,10 @@ chrome.runtime.onConnect.addListener(function(port) {
 					message: 'Error with Kelley Blue Book <a class="btn btn-primary" href="' + request.url + '">Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href="https://www.github.com/hawaiianchimp/kbb-craigslist/issues">here</a>'});
 			  },
 			  success: function(data, responseText, jqXHR){
-			  		var iframe = $('<iframe>',{srcdoc: data,name:'price-iframe',id:'price-iframe', width:'500px',height:'1000px',sandbox:'allow-same-origin allow-scripts allow-top-navigation allow-forms'});
-					$('#kbb-iframe').html(iframe);
-					var extracted = $($.parseHTML(data)).find('#Vehicle-info .pic');
+			  		var iframe = $('<iframe>',{srcdoc: $(data),name:'price-iframe',id:'price-iframe', width:'500px',height:'1000px',sandbox:'allow-same-origin allow-scripts allow-top-navigation allow-forms'});
+					var extracted = $($.parseHTML(data));
+					var pic = extracted.find('#Vehicle-info .pic');
+					$('#kbb-iframe').html(extracted);
 		      		//extracted.find('aside').remove();
 		      		//if(extracted.find('.selected'))
 		      		//extracted.find('.mod-category').not('.selected').remove();
@@ -281,12 +282,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 						e.addClass('kbb-link');
 						var b;
 						var matches = (b=e.attr('href')) ? b.match(/javascript/): false;
-						if(matches)
-						{
+						if(matches){
 							e.remove();
-						}
-						else
-						{
+						} else {
 							e.attr('href', 'https://www.kbb.com' + e.attr('href'));
 						}
 					});
@@ -295,7 +293,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 						//console.log(document);
 						var carPriceInfo = 1;//eval("("+(st=(s=$($('#kbb-iframe').contents()[0]).find('script').text()).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, '')+")");
 						//console.log(carPriceInfo);
-						port.postMessage({url:request.url, kbb_data:request.kbb_data, data:$(document).find('body').html(), img:extracted.html(), type:request.type});
+						port.postMessage({url:request.url, kbb_data:request.kbb_data, data:$(document).find('body').html(), img:pic.html(), type:request.type});
 					});
 					var carPriceInfo = 1;
 					cars.push([{info:request.kbb_data, price:carPriceInfo}]);

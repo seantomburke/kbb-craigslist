@@ -1,0 +1,179 @@
+{
+  "Acura": {
+    "keywords": ["Acura"]
+  },
+  "Alfa Romeo": {
+    "keywords": ["Alfa Romeo"]
+  },
+  "Aston Martin": {
+    "keywords": ["Aston Martin"]
+  },
+  "Audi": {
+    "keywords": ["Audi"]
+  },
+  "Bentley": {
+    "keywords": ["Bentley"]
+  },
+  "BMW": {
+    "keywords": ["BMW"]
+  },
+  "Buick": {
+    "keywords": ["Buick"]
+  },
+  "Cadillac": {
+    "keywords": ["Cadillac"]
+  },
+  "Chevrolet": {
+    "keywords": ["Chevrolet", "Chevy"]
+  },
+  "Chrysler": {
+    "keywords": ["Chrysler"]
+  },
+  "Daewoo": {
+    "keywords": ["Daewoo"]
+  },
+  "Dodge": {
+    "keywords": ["Dodge"]
+  },
+  "Eagle": {
+    "keywords": ["Eagle"]
+  },
+  "Ferrari": {
+    "keywords": ["Ferrari"]
+  },
+  "FIAT": {
+    "keywords": ["FIAT"]
+  },
+  "Fisker": {
+    "keywords": ["Fisker"]
+  },
+  "Ford": {
+    "keywords": ["Ford"]
+  },
+  "Geo": {
+    "keywords": ["Geo"]
+  },
+  "GMC": {
+    "keywords": ["GMC"]
+  },
+  "Honda": {
+    "keywords": ["Honda"]
+  },
+  "HUMMER": {
+    "keywords": ["HUMMER"]
+  },
+  "Hyundai": {
+    "keywords": ["Hyundai"]
+  },
+  "Infinity": {
+    "keywords": ["Infiniti","Infinity"]
+  },
+  "Isuzu": {
+    "keywords": ["Isuzu"]
+  },
+  "Jaguar": {
+    "keywords": ["Jaguar"]
+  },
+  "Jeep": {
+    "keywords": ["Jeep"]
+  },
+  "Kia": {
+    "keywords": ["Kia"]
+  },
+  "Lamborghini": {
+    "keywords": ["Lamborghini"]
+  },
+  "Land Rover": {
+    "keywords": ["Land Rover"]
+  },
+  "Lexus": {
+    "keywords": ["Lexus"]
+  },
+  "Lincoln": {
+    "keywords": ["Lincoln"]
+  },
+  "Lotus": {
+    "keywords": ["Lotus"]
+  },
+  "Maserati": {
+    "keywords": ["Maserati"]
+  },
+  "Maybach": {
+    "keywords": ["Maybach"]
+  },
+  "Mazda": {
+    "keywords": ["Mazda"]
+  },
+  "McLaren": {
+    "keywords": ["McLaren"]
+  },
+  "Mercedes-Benz": {
+    "keywords": ["Mercedes-Benz","Mercedes","Mercedes Benz"]
+  },
+  "Mercury": {
+    "keywords": ["Mercury"]
+  },
+  "MINI": {
+    "keywords": ["MINI"]
+  },
+  "Mitsubishi": {
+    "keywords": ["Mitsubishi"]
+  },
+  "Nissan": {
+    "keywords": ["Nissan"]
+  },
+  "Oldsmobile": {
+    "keywords": ["Oldsmobile"]
+  },
+  "Panoz": {
+    "keywords": ["Panoz"]
+  },
+  "Plymouth": {
+    "keywords": ["Plymouth"]
+  },
+  "Pontiac": {
+    "keywords": ["Pontiac"]
+  },
+  "Porsche": {
+    "keywords": ["Porsche"]
+  },
+  "Ram": {
+    "keywords": ["Ram"]
+  },
+  "Rolls-Royce": {
+    "keywords": ["Rolls-Royce"]
+  },
+  "Saab": {
+    "keywords": ["Saab"]
+  },
+  "Saturn": {
+    "keywords": ["Saturn"]
+  },
+  "Scion": {
+    "keywords": ["Scion"]
+  },
+  "smart": {
+    "keywords": ["smart"]
+  },
+  "SRT": {
+    "keywords": ["SRT"]
+  },
+  "Subaru": {
+    "keywords": ["Subaru"]
+  },
+  "Suzuki": {
+    "keywords": ["Suzuki"]
+  },
+  "Tesla": {
+    "keywords": ["Tesla"]
+  },
+  "Toyota": {
+    "keywords": ["Toyota"]
+  },
+  "Volkswagen": {
+    "keywords": ["Volkswagen"]
+  },
+  "Volvo": {
+    "keywords": ["Volvo"]
+  }
+}
