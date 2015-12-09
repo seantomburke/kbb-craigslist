@@ -10,7 +10,9 @@
     "src/inject/webcode/images/logo240_2x.png",
     "src/inject/webcode/scripts/canvas.js",
     "src/inject/webcode/kbb.html",
-    "icons/kbblogo*.png"
+    "icons/kbblogo*.png",
+    "src/inject/json/models.json",
+    "src/inject/json/models_generated.json"
   ],
   "icons": {
     "16": "icons/kbblogo16.png",
@@ -124,9 +126,5 @@
       "all_frames": true,
       "run_at": "document_end"
     }
-  ],
-  "web_accessible_resources": [
-    "src/inject/json/models.json",
-    "src/inject/json/models_generated.json"
   ]
 }

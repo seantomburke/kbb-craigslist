@@ -12,21 +12,21 @@ $('<div>', {id:'kbb-iframe'}).appendTo('body');
 var cars = [];
 
 function handleClick(port) {
-	$('.kbb-link').on('click', function(e){
-		//console.log(e);
-		e.preventDefault();
-		var url = $(this).attr('href');
-		var m;
-		var type = (m=$(this).attr('href').match(/(styles|options|categories)/))?m[0]:'default';
-		//console.log(url);
-		//console.log(type);
-		port.postMessage({type:type, url: url});
-		port.onMessage.addListener(function(response) {
-			//console.log(response);
-			$('#kbb').html(response.data);
-		//console.log('returned');
-		});
-	});
+  $('.kbb-link').on('click', function(e){
+    //console.log(e);
+    e.preventDefault();
+    var url = $(this).attr('href');
+    var m;
+    var type = (m=$(this).attr('href').match(/(styles|options|categories)/))?m[0]:'default';
+    //console.log(url);
+    //console.log(type);
+    port.postMessage({type:type, url: url});
+    port.onMessage.addListener(function(response) {
+      //console.log(response);
+      $('#kbb').html(response.data);
+    //console.log('returned');
+    });
+  });
 }
 
 
@@ -268,7 +268,14 @@ chrome.runtime.onConnect.addListener(function(port) {
 					message: 'Error with Kelley Blue Book <a class="btn btn-primary" href="' + request.url + '">Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href="https://www.github.com/hawaiianchimp/kbb-craigslist/issues">here</a>'});
 			  },
 			  success: function(data, responseText, jqXHR){
-			  		var iframe = $('<iframe>',{srcdoc: $(data),name:'price-iframe',id:'price-iframe', width:'500px',height:'1000px',sandbox:'allow-same-origin allow-scripts allow-top-navigation allow-forms'});
+          var iframe = $('<iframe>',{
+            srcdoc: $(data),
+            name:'price-iframe',
+            id:'price-iframe',
+            width:'500px',
+            height:'1000px',
+            sandbox:'allow-same-origin allow-scripts allow-top-navigation allow-forms'
+          });
 					var extracted = $($.parseHTML(data));
 					var pic = extracted.find('#Vehicle-info .pic');
 					$('#kbb-iframe').html(extracted);
@@ -289,14 +296,49 @@ chrome.runtime.onConnect.addListener(function(port) {
 						}
 					});
 
+          var extractPriceInfo = function(scripts){
+            //console.log(document);
+            var filterKbbPrice = function(e,i){
+              return e.textContent.indexOf('KBB.DataLayer || []') > -1;
+            };
+            var info;
+            var priceScript = Array.prototype.filter.call(scripts, filterKbbPrice)[0];
+            if(priceScript) {
+              var priceScriptContent = priceScript.innerHTML;
+              var startTag = 'KBB.DataLayer.push(';
+              var endTag = 'catch';
+              var startIndex = priceScriptContent.indexOf(startTag) + startTag.length;
+              var endIndex = priceScriptContent.indexOf(endTag) - endTag.length - 8;
+              var truncatedScriptContent = priceScriptContent.substring(startIndex, endIndex).trim();
+              var replacedScriptContent = truncatedScriptContent.trim()
+                .replace(/\/\/[\s\w\d]+/g, '')
+                .replace(/\'/g, '"')
+                .replace(/\s/g, '')
+                .replace(/\{\}/g, 'null')
+                .replace(/,}/g, '}');
+              carPriceInfo = JSON.parse(replacedScriptContent);
+              console.log(info);
+            }
+          }
+
 					$(document).ready(function(){
-						//console.log(document);
-						var carPriceInfo = 1;//eval("("+(st=(s=$($('#kbb-iframe').contents()[0]).find('script').text()).substring(s.search(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)+s.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()/)[0].length, s.length)).substring(0,st.search(/\);/)).replace(/\s/g, '')+")");
-						//console.log(carPriceInfo);
-						port.postMessage({url:request.url, kbb_data:request.kbb_data, data:$(document).find('body').html(), img:pic.html(), type:request.type});
+            var carPriceInfo = extractPriceInfo(document.querySelectorAll('script'));
+            var carPriceInfoiFrame = extractPriceInfo(extracted.find('script'));
+
+            port.postMessage({
+              url: request.url,
+              kbb_data: request.kbb_data,
+              data: $(document).find('body').html(),
+              img: pic.html(),
+              type: request.type,
+              price: carPriceInfo,
+              iPrice: carPriceInfoiFrame
+            });
+            cars.push([{
+              info: request.kbb_data,
+              price: carPriceInfo
+            }]);
 					});
-					var carPriceInfo = 1;
-					cars.push([{info:request.kbb_data, price:carPriceInfo}]);
 					handleClick(port);
 			  }
 			});
