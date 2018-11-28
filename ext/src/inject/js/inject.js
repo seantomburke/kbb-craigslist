@@ -133,7 +133,7 @@
 	//kbb_data['condition'] = carInfo['condition'];
 
 
-	var url = ('https://www.kbb.com/' + carInfo['make'] + '/' + carInfo['model'] + '/' + carInfo['year'] + '-' + carInfo['make'] + '-' + carInfo['model'] + '/styles/').replace(/ /g,'-');
+	var url = ('https://www.kbb.com/' + carInfo['make'] + '/' + carInfo['model'] + '/' + carInfo['year'] + '/styles/').replace(/ /g,'-');
 	//console.log(url + "?" + serialize(kbb_data));
 	//$('head').prepend($('<base>').attr('href','https://www.kbb.com/'));
 	var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
@@ -311,7 +311,7 @@
 				// 	).hide().fadeIn('slow'));
 
 				var new_url = response.url.replace(/pricetype=(retail|trade-in)/, "pricetype=private-party");
-				$('#kbb').html("<div class='alert alert-warning'><h3>Attempting to call KBB.com...</h3><p>KBB has changed or blocked access to their pricing information. Sit tight while we attept to retrieve KBB's market meter or Click on this link to view the price on their site: <br><a href='" + new_url + "'>" + (new_url).substring(0,50) + '...' + "</a></p></div>");
+				$('#kbb').html('<div class="alert alert-warning"><h3>Attempting to call KBB.com...</h3><p>KBB has changed or blocked access to their pricing information. Sit tight while we attept to retrieve KBB\'s market meter or Click on this link to view the price on their site: <br><a target="_blank" href="' + new_url + '">' + (new_url).substring(0,50) + '...</a></p></div>');
 
 				$('#kbb').append($('<iframe>', {id: 'priceiFrame'}));
 				$('#priceiFrame').attr({'src':new_url, 'scrolling':'no'});
