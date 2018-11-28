@@ -2,7 +2,7 @@
 	port.postMessage({type:'test',connection: 'Connected!'});
 	// $.each($('#Browse-make .UsedCarmakes ul li a'),
 	// 	function(i,e){
-	// 		//console.log($(e));
+	// 		console.log($(e));
 	// });
 
 	// if(l=$('.postingtitle').text().match(/\$([\d,] + )/))
@@ -44,7 +44,7 @@
 		e = $(el).text().split(':');
 		if(typeof e[1] !== 'undefined'){
 			carInfo[e[0].trim()] = e[1].trim();
-			//console.log("carInfo['" + e[0].trim() + "'] = " + e[1].trim());
+			console.log("carInfo['" + e[0].trim() + "'] = " + e[1].trim());
 		}
 		else{
 			carInfo['car'] = e[0];
@@ -53,26 +53,26 @@
 			var year = new RegExp(carInfo['year'],'g');
 			carInfo['model'] = e[0].replace(year, '').replace(carInfo['make'],'').trim().split(' ')[0];
 			carInfo['model'] = carInfo['model'];
-			//console.log("carInfo['car'] = " + e[0].trim());
+			console.log("carInfo['car'] = " + e[0].trim());
 		}
 	});
 	var found = 'searching';
-	//console.log('before', carInfo['condition']);
+	console.log('before', carInfo['condition']);
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['excellent']) > 0) ? 'excellent':carInfo['condition'];
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['very good']) > 0) ? 'very good':carInfo['condition'];
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['good']) > 0) ? 'good':carInfo['condition'];
 	carInfo['condition'] = ($.inArray(carInfo['condition'], conditions['fair']) > 0) ? 'fair':carInfo['condition'];
-	//console.log('after', carInfo['condition']);
+	console.log('after', carInfo['condition']);
 
 	if(!carInfo['model'])
 	{
-		var regex = new RegExp(carInfo['car'].trim() + '\\s(\\w + )\\s');
+		var regex = new RegExp((carInfo['car'] || '').trim() + '\\s(\\w + )\\s');
 		var title = $('.postingtitle').text().match(regex);
-		//console.log(title);
+		console.log(title);
 		if(title && title.length > 1){
 			carInfo['model'] = title[1];
 		}
-		//console.log(carInfo['model']);
+		console.log(carInfo['model']);
 	}
 
 	$.getJSON(chrome.extension.getURL('src/inject/json/models_generated.json'), function(models){
@@ -84,9 +84,9 @@
 		var temp1 = (mtch1)?mtch1[1].replace(/k/,'000').replace(/,/,'').replace(/xxx/, '000'):carInfo['odometer'];
 		var mtch2 = $('#postingbody').text().match(/[^\$0-9](\d{2,3}(,| )?(000|k|xxx|\d{3}))/);
 		var temp2 = (mtch2)?mtch2[1].replace(/k/,'000').replace(/,/,'').replace(/xxx/, '000'):carInfo['odometer'];
-		//console.log(temp1, '>', temp2);
+		console.log(temp1, '>', temp2);
 		carInfo['odometer'] = (temp1 > temp2) ? temp1:temp2;
-		//console.log(carInfo['odometer']);
+		console.log(carInfo['odometer']);
 	}
 
 	listPrice = Number((l=$('.postingtitle').text().match(/\$([\d,]+)/))?l[1].replace(/k/,'000'):0);
@@ -124,7 +124,7 @@
 	conv('condition','condition');
 	kbb_data['mileage']=((n=kbb_data['mileage']) && n.length <= 3)? (n*1000):n;
 	$(document).ready(function(){$('#' + found + 'KBB').insertAfter('#kbb-frame');});
-	//console.log(kbb_data['mileage']);
+	console.log(kbb_data['mileage']);
 
 	//kbb_data['mileage'])?(m=carInfo['odometer']):0;
 	//bx = (b=kbb_data['bodystyle'])?(b=carInfo['type']):0;
@@ -134,9 +134,9 @@
 
 
 	var url = ('https://www.kbb.com/' + carInfo['make'] + '/' + carInfo['model'] + '/' + carInfo['year'] + '/styles/').replace(/ /g,'-');
-	//console.log(url + "?" + serialize(kbb_data));
+	console.log(url + "?" + serialize(kbb_data));
 	//$('head').prepend($('<base>').attr('href','https://www.kbb.com/'));
-	var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
+	var type = (m=url.match(/(style|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
 	port.postMessage({type:type, url: url, kbb_data: kbb_data, carInfo: carInfo});
 	port.onMessage.addListener(function(response){
 		handleResponse(response);
@@ -173,16 +173,16 @@
 	//    }
 	//   });
 
-	//console.log('https://www.seantburke.com/');
+	console.log('https://www.seantburke.com/');
 	var handleClick = function(port){
 				$('.kbb-link').on('click', function(e){
-					//console.log(e);
+					console.log(e);
 					e.preventDefault();
 					$('#kbb-progress').slideDown();
 					var url = $(this).attr('href');
-					var type = (m=$(this).attr('href').match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
-					//console.log(url);
-					//console.log(type);
+					var type = (m=$(this).attr('href').match(/(style|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
+					console.log(url);
+					console.log(type);
 					port.postMessage({type:type, url: url, kbb_data: kbb_data});
 					port.onMessage.addListener(handleResponse);
 				});
@@ -194,11 +194,11 @@
 			console.log(e);
 			e.preventDefault();
 			carInfo['car'] = $('#kbb-year').val() + '-' + $('#kbb-make').val() + '-' + $('#kbb-model').val();
-			carInfo['year'] = $('#kbb-year').val();
-			carInfo['make'] = $('#kbb-make').val();
-			carInfo['model'] = $('#kbb-model').val();
-			var url = ('https://www.kbb.com/' + carInfo['make'] + '/' + carInfo['model'] + '/' + carInfo['car'] + '/styles/?intent=buy-used&mileage=' + $('#kbb-mileage').val()).replace(/ /g,'-');
-			var type = (m=url.match(/(styles|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
+			carInfo['year'] = $('#kbb-year').val().toLowerCase();
+			carInfo['make'] = $('#kbb-make').val().toLowerCase();
+			carInfo['model'] = $('#kbb-model').val().toLowerCase();
+			var url = ('https://www.kbb.com/' + carInfo['make'] + '/' + carInfo['model'] + '/' + carInfo['year'] + '/styles/?intent=buy-used&mileage=' + $('#kbb-mileage').val()).replace(/ /g,'-');
+			var type = (m=url.match(/(style|options|categories|\/condition\/)/))?m[0].replace(/\//g,''):'default';
 			$('#kbb-progress').slideDown('slow');
 			console.log(url);
 			console.log(type);
@@ -208,18 +208,18 @@
 	}
 
 	var handleResponse = function(response) {
-		//console.log(response);
+		console.log(response);
 		if(response.type == 'default'){
-			//console.log('This is the Default type');
-			//console.log(response);
-		//console.log('temp_json', response.data);
+			console.log('This is the Default type');
+			console.log(response);
+		console.log('temp_json', response.data);
 			var temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,\"\/\.] + )(vehicleId:)([\"\s&.\w;,:\-\|\{\}\[\]] + )\);/);
-		//console.log('temp_json', temp_json);
+		console.log('temp_json', temp_json);
 			if(temp_json && temp_json.length > 0){
 				carPriceInfo = ("{ " + temp_json.splice(3,4).join(' ')).replace(/&quot;/g,"'");
-				//console.log(carPriceInfo);
+				console.log(carPriceInfo);
 				d=eval("(" + carPriceInfo + ")");
-				//console.log(d);
+				console.log(d);
 
 
 				kbb_price = {'excellent': d.data.values.privatepartyexcellent.price, 'very good': d.data.values.privatepartyverygood.price, 'good': d.data.values.privatepartygood.price, 'fair':d.data.values.privatepartyfair.price};
@@ -327,8 +327,8 @@
 		}
 		else if(response.type == 'status')
 		{
-			//console.log(response.message);
-			//console.log(response.kbb_data);
+			console.log(response.message);
+			console.log(response.kbb_data);
 			$('#kbb-progress .progress-bar').attr('aria-valuenow', response.progress);
 			$('#kbb-progress .progress-bar').css('width', response.progress + '%');
 			$('#kbb-progress .progress-bar').text(response.message);
@@ -336,8 +336,8 @@
 		}
 		else if(response.type == 'error')
 		{
-			//console.log(response.message);
-			//console.log(response.kbb_data);
+			console.log(response.message);
+			console.log(response.kbb_data);
 			makeDropdowns(function(){
 					// $('#kbb-progress .progress-bar').attr('aria-valuenow', 100);
 					// $('#kbb-progress .progress-bar').css('width', 100 + '%');
@@ -386,13 +386,13 @@
 		}
 		else
 		{
-			//console.log("Type is:" + response.type);
+			console.log("Type is:" + response.type);
 			$('#kbb-progress').slideUp('normal', function(){});
 			$('#kbb').hide().html(response.data).fadeIn('slow');
 			$('#kbb').append($('<a>', {href:response.url,class:'btn btn-primary', target: '_BLANK'}).html('Open in KBB.com').hide().fadeIn('slow'));
 			handleClick(port);
 		}
-	//console.log('returned');
+	console.log('returned');
 	};
 
 	var makeDropdowns = function(callback){
@@ -407,7 +407,7 @@
 		 		$('#kbb').hide().html('Error Retrieving Makes and Models from KBB. Want to report a bug? Submit bugs <a href="https://www.github.com/hawaiianchimp/kbb-craigslist/issues">here</a>').fadeIn('slow');
 			},
 			success: function(data, responseText, jqXHR){
-				//console.log(data);
+				console.log(data);
 				var form = $('<form >',{class:'form-inline', id:'kbb-form'});
 				var kbb_year_group = $("<div class='form-group' id='kbb-year-group'>");
 				var kbb_make_group = $("<div class='form-group' id='kbb-make-group'>");
@@ -503,11 +503,11 @@
 port.onMessage.addListener(handleKBB);
 
 function handleKBB(response){
-//console.log('handling kbb');
+console.log('handling kbb');
 	if(response.type == 'kbb-background')
 	{
-	//console.log(response.message);
-	//console.log(response.kbb_data);
+	console.log(response.message);
+	console.log(response.kbb_data);
 
 		$('#kbb').append($("<div class='kbb-price'>" + response.kbb_data + "</div>").hide().fadeIn('slow'));
 		handleClick(port);
