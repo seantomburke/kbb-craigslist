@@ -1,8 +1,8 @@
 
- var fs = require("fs");
- var contents = fs.readFileSync("models.json");
+var fs = require('fs');
+var contents = fs.readFileSync('models.json');
 // Define to JSON type
- var cars = JSON.parse(contents);
+var cars = JSON.parse(contents);
 // Get Value from JSON
 
 var models = {};
