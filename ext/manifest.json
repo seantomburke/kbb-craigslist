@@ -31,6 +31,7 @@
   },
   "options_page": "src/options_custom/index.html",
   "permissions": [
+    "storage",
     "*://*.kbb.com/*",
     "*://*.keleybluebookimages.com/*",
     "*://*.craigslist.at/*",

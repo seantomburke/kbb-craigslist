@@ -50,12 +50,10 @@ function dot(context, degrees, radius, w, h){
 
 function drawCanvas(canvasId, input)
 {
-    var fairprice = input.kbb.data.values.privatepartyfair.price;
-    var goodprice = input.kbb.data.values.privatepartygood.price;
-    var verygoodprice = input.kbb.data.values.privatepartyverygood.price;
-    var excellentprice = input.kbb.data.values.privatepartyexcellent.price;
-    var scaleLow = Math.floor(input.kbb.data.scale.scaleLow * .85);
-    var scaleHigh = Math.floor(input.kbb.data.scale.scaleHigh);
+    var [{value: excellentprice}, {value: verygoodprice}, {value: goodprice}, {value:fairprice}] = input.kbb.data.apiData.vehicle.values;
+    var [{high}, , ,{low}] = input.kbb.data.apiData.vehicle.values;
+    var scaleLow = Math.floor(low * .85);
+    var scaleHigh = Math.floor(high);
     var listPrice = input.listPrice;
 
     var kbbStartAngle = (((fairprice-scaleLow)/(scaleHigh-scaleLow))*(360-180))+180;

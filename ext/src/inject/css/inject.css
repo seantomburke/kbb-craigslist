@@ -106,7 +106,8 @@ font-weight: bold;
 	float: left;
 }
 
-#kbb-frame .btn-main-cta{
+#kbb-frame .big-button-one {
+	display: block;
 	position: relative;
 	border-color: orange;
 	border-style: solid;
@@ -219,4 +220,8 @@ font-weight: bold;
 
 #kbb-frame .quick-view-overlay{
 	display: none !important;
+}
+
+#kbb-frame #kbb-zipcode-form {
+	font-size: 12px;
 }

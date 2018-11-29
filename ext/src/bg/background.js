@@ -218,7 +218,9 @@ chrome.runtime.onConnect.addListener(function(port) {
 			  },
 			  success: function(data, responseText, jqXHR){
 			  	console.log('options success!');
-			  		var extracted = $($.parseHTML(data));
+					  var extracted = $($.parseHTML(data));
+					  var vehicleid = (v = (m = $(extracted.find('[href*=vehicleid]')).attr('href')) ? m.match(/vehicleid=(\d+)/) : false) ? v[1] : null;
+					  request.kbb_data.vehicleid = vehicleid;
 			  	console.log(extracted);
 					$.each(extracted.find('a'), function(i,el){
 						var e = $(el);
@@ -262,6 +264,7 @@ chrome.runtime.onConnect.addListener(function(port) {
 		}
 		else if(request.type === 'default'){
 			console.log('starting default script');
+			request.url = request.url.replace(/\/valuetype/, '');
 			port.postMessage({type:'status', progress: 100, message:'Getting Price...'});
 			$.ajax({
 			  url: request.url,
@@ -275,17 +278,19 @@ chrome.runtime.onConnect.addListener(function(port) {
 					message: 'Error with Kelley Blue Book <a target="_blank" class="btn btn-primary" href="' + request.url + '">Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href="https://www.github.com/hawaiianchimp/kbb-craigslist/issues">here</a>'});
 			  },
 			  success: function(data, responseText, jqXHR){
-          var iframe = $('<iframe>',{
-            srcdoc: $(data),
-            name:'price-iframe',
-            id:'price-iframe',
-            width:'500px',
-			height:'1000px',
-			scrolling:'yes',
-            sandbox:'allow-same-origin allow-scripts allow-top-navigation allow-forms'
-          });
+					var iframe = $('<iframe>',{
+						srcdoc: $(data),
+						name:'price-iframe',
+						id:'price-iframe',
+						width:'500px',
+						height:'1000px',
+						scrolling:'yes',
+						sandbox:'allow-same-origin allow-scripts allow-top-navigation allow-forms'
+					});
 					var extracted = $($.parseHTML(data));
-					var pic = extracted.find('#Vehicle-info .pic');
+					var pic = extracted.find('#buyerHubOverview');
+					var vehicleid = (v = (m = $(extracted.find('[href*=vehicleid]')).attr('href')) ? m.match(/vehicleid=(\d+)/) : false) ? v[1] : null;
+					request.kbb_data.vehicleid = vehicleid;
 					$('#kbb-iframe').html(extracted);
 		      		//extracted.find('aside').remove();
 		      		//if(extracted.find('.selected'))
@@ -304,52 +309,78 @@ chrome.runtime.onConnect.addListener(function(port) {
 						}
 					});
 
-          var extractPriceInfo = function(scripts){
-            console.log(document);
-            var filterKbbPrice = function(e,i){
-              return e.textContent.indexOf('KBB.DataLayer || []') > -1;
-            };
-            var info;
-            var priceScript = Array.prototype.filter.call(scripts, filterKbbPrice)[0];
-            if(priceScript) {
-              var priceScriptContent = priceScript.innerHTML;
-              var startTag = 'KBB.DataLayer.push(';
-              var endTag = 'catch';
-              var startIndex = priceScriptContent.indexOf(startTag) + startTag.length;
-              var endIndex = priceScriptContent.indexOf(endTag) - endTag.length - 8;
-              var truncatedScriptContent = priceScriptContent.substring(startIndex, endIndex).trim();
-              var replacedScriptContent = truncatedScriptContent.trim()
-                .replace(/\/\/[\s\w\d]+/g, '')
-                .replace(/\'/g, '"')
-                .replace(/\s/g, '')
-                .replace(/\{\}/g, 'null')
-                .replace(/,}/g, '}');
-              carPriceInfo = JSON.parse(replacedScriptContent);
-              console.log(info);
-            }
-          }
+					var extractPriceInfo = function(scripts){
+						console.log(document);
+						var filterKbbPrice = function(e,i){
+						return e.textContent.indexOf('KBB.DataLayer || []') > -1;
+						};
+						var info;
+						var priceScript = Array.prototype.filter.call(scripts, filterKbbPrice)[0];
+						if(priceScript) {
+						var priceScriptContent = priceScript.innerHTML;
+						var startTag = 'KBB.DataLayer.push(';
+						var endTag = 'catch';
+						var startIndex = priceScriptContent.indexOf(startTag) + startTag.length;
+						var endIndex = priceScriptContent.indexOf(endTag) - endTag.length - 8;
+						var truncatedScriptContent = priceScriptContent.substring(startIndex, endIndex).trim();
+						var replacedScriptContent = truncatedScriptContent.trim()
+							.replace(/\/\/[\s\w\d]+/g, '')
+							.replace(/\'/g, '"')
+							.replace(/\s/g, '')
+							.replace(/\{\}/g, 'null')
+							.replace(/,}/g, '}');
+						carPriceInfo = JSON.parse(replacedScriptContent);
+						console.log(info);
+						}
+					}
+					var meterUrl = 'https://www.kbb.com/Api/3.9.242.0/67434/vehicle/upa/PriceAdvisor/meter.json'
+					var meterData = {
+						action: 'Get',
+						intent: 'buy-used',
+						pricetype: 'Private Party',
+						zipcode: request.kbb_data.zipcode,
+						vehicleid: request.kbb_data.vehicleid,
+						hideMonthlyPayment: 'True',
+						condition: request.kbb_data.condition,
+						mileage: request.kbb_data.mileage,
+					};
 
-					$(document).ready(function(){
-            var carPriceInfo = extractPriceInfo(document.querySelectorAll('script'));
-            var carPriceInfoiFrame = extractPriceInfo(extracted.find('script'));
+					$.ajax({
+						url: meterUrl,
+						dataType: 'json',
+						type: 'GET',
+						data: meterData,
+						error: function(jqXHR, textStatus, errorThrown){
+							console.log('error', request.url);
+							console.log(jqXHR, textStatus, errorThrown);
+							port.postMessage({jqXHR: jqXHR, textStatus: textStatus, errorThrown: errorThrown, type:'error', url:request.url,
+							message: 'Error with Kelley Blue Book <a target="_blank" class="btn btn-primary" href="' + request.url + '">Visit KBB.com</a><br><br>Want to report a bug? Submit bugs <a href="https://www.github.com/hawaiianchimp/kbb-craigslist/issues">here</a>'});
+						},
+						success: function(meterData, meterResponseText, meterjqXHR){
+							$(document).ready(function(){
+								var carPriceInfo = extractPriceInfo(document.querySelectorAll('script'));
+								var carPriceInfoiFrame = extractPriceInfo(extracted.find('script'));
 
-            port.postMessage({
-              url: request.url,
-              kbb_data: request.kbb_data,
-              data: $(document).find('body').html(),
-              img: pic.html(),
-              type: request.type,
-              price: carPriceInfo,
-              iPrice: carPriceInfoiFrame
-            });
-            cars.push([{
-              info: request.kbb_data,
-              price: carPriceInfo
-            }]);
+								port.postMessage({
+								url: request.url,
+								kbb_data: request.kbb_data,
+								data: data,
+								img: $(pic).html(),
+								meterData: meterData,
+								type: request.type,
+								price: carPriceInfo,
+								iPrice: carPriceInfoiFrame
+								});
+								cars.push([{
+								info: request.kbb_data,
+								price: carPriceInfo
+								}]);
+							});
+							handleClick(port);
+						},
 					});
-					handleClick(port);
-			  }
-			});
+				}
+			})
 		}
 		else if(request.type === 'condition'){
 			console.log('starting condition script');
