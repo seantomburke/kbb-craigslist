@@ -1,14 +1,12 @@
-function toRadians(angle) {
-  return angle * (Math.PI / 180);
-}
+const toRadians = angle => angle * (Math.PI / 180);
 
 function dot(context, degrees, radius, w, h) {
   context.save();
   context.beginPath();
 
-  var x = radius * Math.cos(toRadians(degrees + 180));
-  var y = radius * Math.sin(toRadians(degrees + 180));
-  //console.log({x:x,y:y, degrees: degrees, radius:radius});
+  const x = radius * Math.cos(toRadians(degrees + 180));
+  const y = radius * Math.sin(toRadians(degrees + 180));
+  // console.log({x:x,y:y, degrees: degrees, radius:radius});
 
   context.translate(x, y);
   context.scale(w / 2, h / 2);
@@ -18,27 +16,24 @@ function dot(context, degrees, radius, w, h) {
 }
 
 function drawCanvas(/* canvasId, input */) {
-  // var fairprice = input.kbb.data.values.privatepartyfair.price;
-  // var goodprice = input.kbb.data.values.privatepartygood.price;
-  // var verygoodprice = input.kbb.data.values.privatepartyverygood.price;
-  // var excellentprice = input.kbb.data.values.privatepartyexcellent.price;
-  // var scaleLow = Math.floor(input.kbb.data.scale.scaleLow * 0.85);
-  // var scaleHigh = Math.floor(input.kbb.data.scale.scaleHigh);
-
-  // var kbbStartAngle =
+  // let fairprice = input.kbb.data.values.privatepartyfair.price;
+  // let goodprice = input.kbb.data.values.privatepartygood.price;
+  // let verygoodprice = input.kbb.data.values.privatepartyverygood.price;
+  // let excellentprice = input.kbb.data.values.privatepartyexcellent.price;
+  // let scaleLow = Math.floor(input.kbb.data.scale.scaleLow * 0.85);
+  // let scaleHigh = Math.floor(input.kbb.data.scale.scaleHigh);
+  // let kbbStartAngle =
   //   ((fairprice - scaleLow) / (scaleHigh - scaleLow)) * (360 - 180) + 180;
-  // var kbbEndAngle =
+  // let kbbEndAngle =
   //   ((excellentprice - scaleLow) / (scaleHigh - scaleLow)) * (360 - 180) + 180;
-
-  // var redSemiCircleStartAngle = kbbEndAngle;
-  // var greySemiCircleEndAngle = redSemiCircleStartAngle;
-  // var greenSemiCircleStartAngle = kbbStartAngle;
-  // var greenSemiCircleEndAngle = redSemiCircleStartAngle;
-
-  // var minPriceContent = '$' + scaleLow;
-  // var maxPriceContent = '$' + scaleHigh;
-  // var excellentPriceContent = '$' + excellentprice;
-  // var fairPriceContent = '$' + fairprice;
-  // var goodPriceContent = '$' + goodprice;
-  // var veryGoodPriceContent = '$' + verygoodprice;
+  // let redSemiCircleStartAngle = kbbEndAngle;
+  // let greySemiCircleEndAngle = redSemiCircleStartAngle;
+  // let greenSemiCircleStartAngle = kbbStartAngle;
+  // let greenSemiCircleEndAngle = redSemiCircleStartAngle;
+  // let minPriceContent = '$' + scaleLow;
+  // let maxPriceContent = '$' + scaleHigh;
+  // let excellentPriceContent = '$' + excellentprice;
+  // let fairPriceContent = '$' + fairprice;
+  // let goodPriceContent = '$' + goodprice;
+  // let veryGoodPriceContent = '$' + verygoodprice;
 }
