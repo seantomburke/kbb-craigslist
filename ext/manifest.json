@@ -10,8 +10,8 @@
     "src/inject/js/canvas.js",
     "src/inject/kbb.html",
     "icons/kbblogo*.png",
-    "src/inject/js/models.json",
-    "src/inject/js/models_generated.json"
+    "src/inject/js/makes.json",
+    "src/inject/js/makes_generated.json"
   ],
   "icons": {
     "16": "icons/kbblogo16.png",

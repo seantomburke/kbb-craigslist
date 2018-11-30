@@ -40,7 +40,6 @@ port.postMessage({ type: 'test', connection: 'Connected!' });
  */
 const handleForm = (newPort, kbbData) => {
   $('#kbb-submit').on('click', e => {
-    console.log(e);
     e.preventDefault();
     const year = $('#kbb-year')
       .val()
@@ -54,11 +53,10 @@ const handleForm = (newPort, kbbData) => {
     const newUrl = `https://www.kbb.com/${make}/${model}/${year}/styles/?intent=buy-used&mileage=${$(
       '#kbb-mileage'
     ).val()}`.replace(/ /g, '-');
-    const newMatch = newUrl.match(/(style|options|categories|\/condition\/)/);
+    const newMatch = newUrl.match(/(style|options|categories|\/condition\/)/i);
     const newType = newMatch ? newMatch[0].replace(/\//g, '') : 'default';
     $('#kbb-progress').slideDown('slow');
-    console.log(newUrl);
-    console.log(newType);
+
     newPort.postMessage({ type: newType, url: newUrl, kbbData });
     newPort.onMessage.addListener(response => {
       handleResponse(response);
@@ -111,7 +109,6 @@ const makeDropdowns = (callback, carInfo, kbbData) => {
         .fadeIn('slow');
     },
     success(data) {
-      console.log(data);
       const form = $('<form >', { class: 'form-inline', id: 'kbb-form' });
       const kbbYearGroup = $('<div class="form-group" id="kbb-year-group">');
       const kbbMakeGroup = $('<div class="form-group" id="kbb-make-group">');
@@ -238,11 +235,10 @@ const makeDropdowns = (callback, carInfo, kbbData) => {
 const handleClick = (newPort, data) => {
   // if a link has the class .kbb-link which was added in the background script, then handle it ourselves
   $('.kbb-link').on('click', e => {
-    console.log(e);
     e.preventDefault();
     $('#kbb-progress').slideDown();
     const newUrl = e.currentTarget.getAttribute('href');
-    const newMatch = newUrl.match(/(style|options|categories|\/condition\/)/);
+    const newMatch = newUrl.match(/(style|options|categories|\/condition\/)/i);
     const newType = newMatch ? newMatch[0].replace(/\//g, '') : 'default';
     newPort.postMessage({ type: newType, url: newUrl, kbbData: data });
     newPort.onMessage.addListener(response => {
@@ -256,11 +252,7 @@ const handleClick = (newPort, data) => {
  * @param {Object} response
  */
 const handleKBB = (response, data) => {
-  console.log('handling kbb');
   if (response.type === 'kbb-background') {
-    console.log(response.message);
-    console.log(response.kbbData);
-
     $('#kbb').append(
       $(`<div class='kbb-price'>${response.kbbData}</div>`)
         .hide()
@@ -275,24 +267,29 @@ const handleKBB = (response, data) => {
 };
 
 // store the title and body texts
-const postingTitle = $('.postingtitle').text();
+const postingTitle = $('#titletextonly').text();
+const priceText = $('.price').text();
 const postingBody = $('#postingbody').text();
 
 // Get the list price from the posting title and body
-const titlePrice = postingTitle.match(/\$([\d,]+)/);
+const titlePrice = postingTitle.match(/\$([\d,]+)/i);
 const bodyPrice = postingBody.match(/\$([\d,]+)/);
 
 // set the list price
-let listPrice = 0;
-if (titlePrice && titlePrice.length > 1) {
-  listPrice = Number(titlePrice[1].replace(/k/, '000'));
-}
+let [, listPrice] = priceText.match(/\$([\d,]+)/i) || [0, 0];
+if (!listPrice) {
+  if (titlePrice && titlePrice.length > 1) {
+    listPrice = Number(titlePrice[1].replace(/k/, '000'));
+  }
 
-if (listPrice < 99) {
-  if (bodyPrice && bodyPrice.length > 1) {
-    listPrice = Number(bodyPrice[1].replace(/k/, '000'));
+  if (listPrice < 99) {
+    if (bodyPrice && bodyPrice.length > 1) {
+      listPrice = Number(bodyPrice[1].replace(/k/, '000'));
+    }
   }
 }
+// convert to number
+listPrice = Number(listPrice);
 
 /**
  * All of the conditions constants
@@ -308,38 +305,33 @@ const conditions = {
  * Parse through Craigslist and get the car data
  */
 const carInfo = {};
-// These are the small spans right under the map
-$.each($('.mapAndAttrs p.attrgroup span'), (i, el) => {
-  const e = $(el)
-    .text()
-    .split(':');
-  // parse through each item, e.g. make:toyota and store it
-  if (typeof e[1] !== 'undefined') {
-    carInfo[e[0].trim()] = e[1].trim();
-    console.log(`carInfo['${e[0].trim()}'] = ${e[1].trim()}`);
-  } else {
-    // If it doesn't split, then it's the name of the car
-    [carInfo.car] = e;
-    // look for numbers like 1998 or 2020 that could be a year
-    const p = e[0].match(/(19|20)[0-9]{2}/);
-    carInfo.year = p ? p[0] : null;
 
-    // Check the text to see if we can match a make
-    const b = e[0].match(
-      /(Acura|Alfa Romeo|Aston Martin|Audi|Bentley|BMW|Buick|Cadillac|Chevrolet|Chrysler|Daewoo|Dodge|Eagle|Ferrari|FIAT|Fisker|Ford|Geo|GMC|Honda|HUMMER|Hyundai|Infinit(i|y)|Isuzu|Jaguar|Jeep|Kia|Lamborghini|Land Rover|Lexus|Lincoln|Lotus|Maserati|Maybach|Mazda|McLaren|Mercedes((-| )Benz)?|Mercury|MINI|Mitsubishi|Nissan|Oldsmobile|Panoz|Plymouth|Pontiac|Porsche|Ram|Rolls-Royce|Saab|Saturn|Scion|smart|SRT|Subaru|Suzuki|Tesla|Toyota|Volkswagen|Volvo)/i
-    );
-    carInfo.make = b != null ? b[0] : null;
-    // replace the year and make, and you should be left with the model
-    const year = new RegExp(carInfo.year, 'g');
-    [carInfo.model] = e[0]
-      .replace(year, '')
-      .replace(carInfo.make, '')
-      .trim()
-      .split(' ');
+// The first one is the name of the car
+carInfo.car = $('.attrgroup')
+  .first()
+  .find('span')
+  .text()
+  .trim();
+// look for numbers like 1998 or 2020 that could be a year
+const yearMatches = carInfo.car.match(/(19|20)[0-9]{2}/);
+carInfo.year = yearMatches ? yearMatches[0] : null;
+
+// These are the small spans right under the map
+$.each(
+  $('.mapAndAttrs p.attrgroup')
+    .last()
+    .find('span'),
+  (i, el) => {
+    const e = $(el)
+      .text()
+      .split(':');
+    // parse through each item, e.g. make:toyota and store it
+    if (typeof e[1] !== 'undefined') {
+      carInfo[e[0].trim()] = e[1].trim();
+    }
   }
-});
+);
 const found = 'searching';
-console.log('before', carInfo.condition);
 
 // Go through and check to see if the condition that was set can match one on kbb
 carInfo.condition = conditions.excellent.includes(carInfo.condition)
@@ -355,23 +347,6 @@ carInfo.condition = conditions.fair.includes(carInfo.condition) ? 'fair' : carIn
 if (!carInfo.condition) {
   carInfo.condition = 'good';
 }
-console.log('after', carInfo.condition);
-
-// If there's no car mode, then get it from the posting title
-if (!carInfo.model) {
-  const regex = new RegExp(`${carInfo.year}\\s${carInfo.make}\\s(\\w+)\\s`, 'i');
-  const model = postingTitle.match(regex);
-  if (model && model.length > 1) {
-    [, carInfo.model] = model;
-  }
-}
-if (!carInfo.model) {
-  const regex = new RegExp(`${carInfo.year}\\s${carInfo.make}\\s(\\w+)\\s`, 'i');
-  const model = postingBody.match(regex);
-  if (model && model.length > 1) {
-    [, carInfo.model] = model;
-  }
-}
 
 // get the mileage from the title or the body
 if (!carInfo.odometer) {
@@ -382,12 +357,12 @@ if (!carInfo.odometer) {
     carInfo.odometer = titleMileage[1]
       .replace(/k/i, '000')
       .replace(/,/, '')
-      .replace(/xxx/, '000');
+      .replace(/xxx/i, '000');
   } else if (bodyMileage && bodyMileage.length > 1) {
     carInfo.odometer = bodyMileage[1]
       .replace(/k/i, '000')
       .replace(/,/, '')
-      .replace(/xxx/, '000');
+      .replace(/xxx/i, '000');
   }
 }
 
@@ -490,42 +465,95 @@ kbbData.mileage = n < 1000 ? n * 1000 : n;
 $(document).ready(() => {
   $(`#${found}KBB`).insertAfter('#kbb-frame');
 });
-console.log(kbbData.mileage);
 
 // x = kbbData.mileage ? (m = carInfo.odometer) : 0;
 // bx = (b = kbbData.bodystyle) ? (b = carInfo.type) : 0;
 // cx = (b = kbbData.condition) ? (b = carInfo.condition) : 0;
 // kbbData.vehicleid = carInfo.VIN;
 
-// Get the initial URL to retrieve from kbb
-const { make, model, year } = carInfo;
-const url = `https://www.kbb.com/${make}/${model}/${year}/styles/`.replace(/\s/g, '-');
-console.log(`${url}?${serialize(kbbData)}`);
-// $('head').prepend($('<base>').attr('href','https://www.kbb.com/'));
-const m = url.match(/(style|options|categories|\/condition\/)/);
-const type = m ? m[0].replace(/\//g, '') : 'default';
-
-// Send a message to the background
-
+// Get the zipcode from chrome sync settings
 getZipcode(zipcode => {
+  // Add a form input with the stored zipcode
   $('[name=zipcode-submit]').before(
     `<input placeholder="Zipcode" class="form-control" type="text" name="zipcode" value="${zipcode}"/>`
   );
-  kbbData.zipcode = zipcode;
-  carInfo.zipcode = zipcode;
 
-  port.postMessage({
-    type,
-    url,
-    kbbData,
-    carInfo
+  $.getJSON(chrome.extension.getURL('src/inject/js/makes_generated.json'), carMakes => {
+    const carMakeRegex = Object.keys(carMakes).join('|');
+    const makeMatches = carInfo.car.match(new RegExp(`(${carMakeRegex})`, 'i'));
+    carInfo.make = makeMatches ? makeMatches[1] : null;
+    if (!carInfo.make) {
+      const titleMatches = postingTitle.match(new RegExp(`(${carMakeRegex})`, 'i'));
+      carInfo.make = titleMatches ? titleMatches[1] : null;
+    }
+
+    if (!carInfo.make) {
+      const bodyMatches = postingBody.match(new RegExp(`(${carMakeRegex})`, 'i'));
+      carInfo.make = bodyMatches ? bodyMatches[1] : null;
+    }
+
+    // replace the year and make, and you should be left with the model
+    const yearRegex = new RegExp(carInfo.year, 'g');
+    [carInfo.model] = carInfo.car
+      .replace(yearRegex, '')
+      .replace(carInfo.make, '')
+      .trim()
+      .split(' ');
+
+    // If there's no car model, then get it from the posting title
+    if (!carInfo.model) {
+      const regex = new RegExp(`${carInfo.year}\\s${carInfo.make}\\s(\\w+)\\s`, 'i');
+      const model = postingTitle.match(regex);
+      if (model && model.length > 1) {
+        [, carInfo.model] = model;
+      }
+    }
+    if (!carInfo.model) {
+      carInfo.model = postingTitle
+        .replace(carInfo.year, '')
+        .replace(carInfo.make, '')
+        .replace(carInfo.listPrice, '')
+        .replace(/-./)
+        .trim();
+    }
+    if (!carInfo.model) {
+      const regex = new RegExp(`${carInfo.year}\\s${carInfo.make}\\s(\\w+)\\s`, 'i');
+      const model = postingBody.match(regex);
+      if (model && model.length > 1) {
+        [, carInfo.model] = model;
+      }
+    }
+
+    // Normalize the make to the correct make
+    if (carInfo.make) {
+      carInfo.make = carMakes[carInfo.make.toLowerCase()];
+    }
+
+    // set the zipcode
+    kbbData.zipcode = zipcode;
+    carInfo.zipcode = zipcode;
+
+    // Get the initial URL to retrieve from kbb
+    const { make, model, year } = carInfo;
+    const url = `https://www.kbb.com/${make}/${model}/${year}/styles/`.replace(/\s/g, '-');
+    // $('head').prepend($('<base>').attr('href','https://www.kbb.com/'));
+    const m = url.match(/(style|options|categories|\/condition\/)/i);
+    const type = m ? m[0].replace(/\//g, '') : 'default';
+
+    // Send a message to the background
+    port.postMessage({
+      type,
+      url,
+      kbbData,
+      carInfo
+    });
   });
 });
 
-console.log('https://www.seantburke.com/');
-
+// Attach the click handler
 handleClick(port, kbbData);
 
+// Attach the zipcode form handler which stores the zipcode
 const handleZipcode = () => {
   $('#kbb-form').on('submit', e => {
     e.preventDefault();
@@ -533,6 +561,8 @@ const handleZipcode = () => {
     carInfo.zipcode = zipcode;
     kbbData.zipcode = zipcode;
     chrome.storage.sync.set({ zipcode });
+
+    // display the saved text when updating zipcode
     $('#zipcode-saved')
       .html('<font color="green">Saved!</font>')
       .fadeIn()
@@ -542,14 +572,10 @@ const handleZipcode = () => {
 };
 handleZipcode();
 
+// Handle the response from the backend
 const handleResponse = response => {
-  console.log(response);
   if (response.type === 'default') {
-    console.log('This is the Default type');
-    console.log(response);
-    console.log('temp_json', response.data);
-    // let temp_json = response.data.match(/(KBB\.Vehicle\.Pages\.PricingOverview\.Buyers\.setup\()\{([.\s\/\w:?&;,\"\/\.] + )(vehicleId:)([\"\s&.\w;,:\-\|\{\}\[\]] + )\);/);
-    // console.log('temp_json', temp_json);
+    // Make sure the data is legit and can be parsed without errors
     if (
       response &&
       response.meterData &&
@@ -559,8 +585,10 @@ const handleResponse = response => {
       response.meterData.data.apiData.vehicle.values &&
       response.meterData.data.apiData.vehicle.values.length
     ) {
+      // Get the price objects for each tier
       const [excellent, vgood, good, fair] = response.meterData.data.apiData.vehicle.values;
 
+      // Get the base prices
       const kbbPrice = {
         excellent: excellent.base,
         vgood: vgood.base,
@@ -568,26 +596,35 @@ const handleResponse = response => {
         fair: fair.base
       };
       const { mileage } = response.kbbData;
-      let currentPrice;
 
+      // set the current price based on condition
+      let currentPrice;
       if (kbbPrice[carInfo.condition]) {
         currentPrice = kbbPrice[carInfo.condition];
       } else {
         currentPrice = kbbPrice.fair;
       }
+
+      // Set the color class
       const cd = carInfo.condition;
       const currentClass = cd ? cd.replace(/\s/, '') : 'fair';
       const priceLabel = `Kbb Price: <span class='${currentClass}'>${toMoney(currentPrice)}</span>`;
+
+      // Get the image div from backend
       $('#kbb')
         .hide()
         .html($(response.img))
         .fadeIn('slow');
+
+      // Mileage
       $('#kbb').prepend($(`<h2>Mileage: ${toMiles(Number(mileage))}<h2>`));
+      // Car Info
       $('#kbb').prepend(
         $('<h2>', {
           id: 'carInfo'
         }).html(`${carInfo.year} ${carInfo.make} ${carInfo.model}`)
       );
+      // Price Info
       $('#kbb').append(
         $('<h1>', {
           id: 'price',
@@ -597,8 +634,8 @@ const handleResponse = response => {
           .hide()
           .fadeIn('slow')
       );
+      // Get the price Diff and change colors
       let priceDiffLabel;
-
       if (listPrice > currentPrice) {
         priceDiffLabel = `
         <span class='red'>
@@ -623,6 +660,7 @@ const handleResponse = response => {
           .fadeIn('slow')
       );
 
+      // Create a table of prices
       const table = $('<table class="table table-hover">');
       table.append(`<thead>
       <tr>
@@ -687,7 +725,7 @@ const handleResponse = response => {
       table.append(trFair);
       $('#kbb').append(table);
 
-      // canvas
+      // canvas for drawing the meter
       $('#kbb').append($('<div>', { id: 'kbb-price-canvas' }));
       $('#kbb-price-canvas').html(
         `<img id="kbblogo" src="${chrome.extension.getURL('/src/inject/images/logo240.png')}"/>
@@ -708,6 +746,8 @@ const handleResponse = response => {
           />
         </div>`
       );
+
+      // Draw the actual canvas
       drawCanvas('mainCanvas', {
         kbb: response.meterData,
         listPrice
@@ -716,6 +756,7 @@ const handleResponse = response => {
         .append($(`<img src="https://${response.meterData.href}"/>`))
         .fadeIn('slow');
     } else if (!response.kbbData.zipcode) {
+      // If no zipcode was provided, let the user know, and give them a restart link
       const restartUrl = response.url.replace(
         /pricetype=(retail|trade-in)/,
         'pricetype=private-party'
@@ -807,6 +848,7 @@ const handleResponse = response => {
       // )
       // // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
+      // If error, give the user a link to kbb.com
       const newUrl = response.url.replace(/pricetype=(retail|trade-in)/, 'pricetype=private-party');
       $('#kbb').html(
         `<div class="alert alert-warning">
@@ -817,10 +859,12 @@ const handleResponse = response => {
         </div>`
       );
 
+      // Show the kbb iFrame too
       $('#kbb').append($('<iframe>', { id: 'priceiFrame' }));
       $('#priceiFrame').attr({ src: newUrl, scrolling: 'yes' });
     }
 
+    // Append the button to open in kbb
     $('#kbb').append(
       $('<a>', {
         href: `${response.url}?${serialize(response.kbbData)}`,
@@ -832,20 +876,18 @@ const handleResponse = response => {
         .fadeIn('slow')
     );
     handleClick(port, kbbData);
+
+    // Hide the slide
     $('#kbb-progress').slideUp('fast', () => {
       $('#kbb-progress .progress-bar').attr('aria-valuenow', 0);
       $('#kbb-progress .progress-bar').css('width', `${0}%`);
     });
   } else if (response.type === 'status') {
-    console.log(response.message);
-    console.log(response.kbbData);
     $('#kbb-progress .progress-bar').attr('aria-valuenow', response.progress);
     $('#kbb-progress .progress-bar').css('width', `${response.progress}%`);
     $('#kbb-progress .progress-bar').text(response.message);
     $('#kbb-progress').slideDown('normal');
   } else if (response.type === 'error') {
-    console.log(response.message);
-    console.log(response.kbbData);
     makeDropdowns(
       () => {
         // $('#kbb-progress .progress-bar').attr('aria-valuenow', 100);
@@ -872,6 +914,7 @@ const handleResponse = response => {
             .fadeIn('slow')
         );
         $('#error-box').append('<div class="timer-warning">');
+        // Open KBB in the background
         // setTimeout(() => {
         //   const warningMessage = 'Opening kbb.com in background tab';
         //   $('.timer-warning')
@@ -903,6 +946,7 @@ const handleResponse = response => {
     //   window.open(response.url, '_BLANK');
     // }, 4000);
   } else if (response.type === 'init_error') {
+    // Couldn't get the URL, so show dropdown menus to let user select manually
     if (carInfo.year && carInfo.year < 1994) {
       makeDropdowns(
         () => {
@@ -912,6 +956,7 @@ const handleResponse = response => {
             $('#kbb-progress .progress-bar').attr('aria-valuenow', 0);
             $('#kbb-progress .progress-bar').css('width', `${0}%`);
           });
+          // Show error that KBB doesn't allow cars older than 1994
           $('#kbb').prepend(
             $('<div>')
               .hide()
@@ -951,12 +996,14 @@ const handleResponse = response => {
       );
     }
   } else {
-    console.log(`Type is:${response.type}`);
-    $('#kbb-progress').slideUp('normal', () => {});
+    // Hide the progress bar
+    $('#kbb-progress').slideUp('normal');
     $('#kbb')
       .hide()
       .html(response.data)
       .fadeIn('slow');
+
+    // append the open KBB button
     $('#kbb').append(
       $('<a>', {
         href: response.url,
@@ -969,7 +1016,6 @@ const handleResponse = response => {
     );
     handleClick(port, kbbData);
   }
-  console.log('returned');
 };
 
 port.onMessage.addListener(response => {
