@@ -57,5 +57,5 @@ export const usedCars = [
   'Tesla',
   'Toyota',
   'Volkswagen',
-  'Volvo',
+  'Volvo'
 ];

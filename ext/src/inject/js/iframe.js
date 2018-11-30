@@ -1,7 +1,7 @@
 $(document).ready(() => {
   // console.info("iFrame Script Running");
   if (
-    window.location.toString().indexOf('kbb.com') > -1 &&
+    window.location.toString().includes('kbb.com') &&
     window.location !== window.parent.location
   ) {
     // console.info("iFrame Script is kbb.com");

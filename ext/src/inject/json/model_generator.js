@@ -1,14 +1,14 @@
+const fs = require('fs');
 
-var fs = require('fs');
-var contents = fs.readFileSync('models.json');
+const contents = fs.readFileSync('models.json');
 // Define to JSON type
-var cars = JSON.parse(contents);
+const cars = JSON.parse(contents);
 // Get Value from JSON
 
-var models = {};
+const models = {};
 
-Object.keys(cars).forEach( function (car) {
-  cars[car]['keywords'].forEach(function(keyword){
+Object.keys(cars).forEach(car => {
+  cars[car].keywords.forEach(keyword => {
     models[keyword] = car;
   });
 });

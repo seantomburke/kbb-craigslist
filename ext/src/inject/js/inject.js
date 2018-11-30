@@ -231,11 +231,8 @@ console.log(kbbData.mileage);
 // cx = (b = kbbData.condition) ? (b = carInfo.condition) : 0;
 // kbbData.vehicleid = carInfo.VIN;
 // kbbData.condition = carInfo.condition;
-
-const url = `https://www.kbb.com/${carInfo.make}/${carInfo.model}/${carInfo.year}/styles/`.replace(
-  / /g,
-  '-'
-);
+const { make, model, year } = carInfo;
+const url = `https://www.kbb.com/${make}/${model}/${year}/styles/`.replace(/\s/g, '-');
 console.log(`${url}?${serialize(kbbData)}`);
 // $('head').prepend($('<base>').attr('href','https://www.kbb.com/'));
 const m = url.match(/(style|options|categories|\/condition\/)/);
