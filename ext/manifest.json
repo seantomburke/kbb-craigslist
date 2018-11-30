@@ -5,14 +5,13 @@
   "description": "Kelley Blue Book for Craigslist allows you to quickly find the true KBB value for cars on Craigslist so you can find a good deal",
   "homepage_url": "http://www.seantburke.com",
   "web_accessible_resources": [
+    "src/inject/images/logo240.png",
     "src/inject/fonts/glyphicons-halflings-regular.*",
-    "src/inject/webcode/images/logo240.png",
-    "src/inject/webcode/images/logo240_2x.png",
-    "src/inject/webcode/scripts/canvas.js",
-    "src/inject/webcode/kbb.html",
+    "src/inject/js/canvas.js",
+    "src/inject/kbb.html",
     "icons/kbblogo*.png",
-    "src/inject/json/models.json",
-    "src/inject/json/models_generated.json"
+    "src/inject/js/models.json",
+    "src/inject/js/models_generated.json"
   ],
   "icons": {
     "16": "icons/kbblogo16.png",
@@ -20,16 +19,14 @@
     "128": "icons/kbblogo128.png"
   },
   "content_security_policy": "script-src 'self' https://ssl.google-analytics.com https://www.google-analytics.com 'unsafe-eval'; object-src 'self'",
-  "default_locale": "en",
   "background": {
     "scripts": [
-      "src/bg/libs/jquery/jquery-1.11.0.min.js",
-      "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
+      "src/libs/jquery/jquery-1.11.0.min.js",
+      "src/libs/jquery/jquery-migrate-1.2.1.min.js",
       "src/bg/background.js"
     ],
     "persistent": true
   },
-  "options_page": "src/options_custom/index.html",
   "permissions": [
     "storage",
     "*://*.kbb.com/*",
@@ -111,11 +108,11 @@
         "*://*.craigslist.tr/*/ct*/*.html"
       ],
       "js": [
-        "src/bg/libs/jquery/jquery-1.11.0.min.js",
-        "src/bg/libs/jquery/jquery-migrate-1.2.1.min.js",
-        "src/bg/libs/bootstrap/bootstrap.min.js",
+        "src/libs/jquery/jquery-1.11.0.min.js",
+        "src/libs/jquery/jquery-migrate-1.2.1.min.js",
+        "src/libs/bootstrap/bootstrap.min.js",
         "src/inject/js/inject.js",
-        "src/inject/webcode/scripts/canvas.js",
+        "src/inject/js/canvas.js",
         "src/inject/js/iframe.js"
       ],
       "css": [

@@ -1,17 +1,17 @@
-if (self === top) {
+if (window.self === window.top) {
   // console.log('not in iFrame');
   setInterval(() => {
     console.log('self == top');
-    console.log('self  :', self.window.location.href);
-    console.log('parent:', parent.window.location.href);
-    console.log('top   :', top.window.location.href);
+    console.log('self  :', window.self.window.location.href);
+    console.log('parent:', window.parent.window.location.href);
+    console.log('top   :', window.top.window.location.href);
   }, 5000);
-} else if (parent === top) {
+} else if (window.parent === window.top) {
   setInterval(() => {
     console.log('parent == top');
-    console.log('self  :', self.window.location.href);
-    console.log('parent:', parent.window.location.href);
-    console.log('top   :', top.window.location.href);
+    console.log('self  :', window.self.window.location.href);
+    console.log('parent:', window.parent.window.location.href);
+    console.log('top   :', window.top.window.location.href);
   }, 5000);
 
   const bootstrap = document.createElement('script');

@@ -94,7 +94,7 @@ function drawCanvas(canvasId, input) {
 
   // // Image Declarations
   const logo240 = new Image();
-  logo240.src = chrome.extension.getURL('/src/inject/webcode/images/logo240.png');
+  logo240.src = chrome.extension.getURL('/src/inject/images/logo240.png');
 
   // // Abstracted Attributes
   // let redSemiCircleStartAngle = 315;
