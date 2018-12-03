@@ -317,20 +317,15 @@ const yearMatches = carInfo.car.match(/(19|20)[0-9]{2}/);
 carInfo.year = yearMatches ? yearMatches[0] : null;
 
 // These are the small spans right under the map
-$.each(
-  $('.mapAndAttrs p.attrgroup')
-    .last()
-    .find('span'),
-  (i, el) => {
-    const e = $(el)
-      .text()
-      .split(':');
-    // parse through each item, e.g. make:toyota and store it
-    if (typeof e[1] !== 'undefined') {
-      carInfo[e[0].trim()] = e[1].trim();
-    }
+$.each($('.mapAndAttrs p.attrgroup').find('span'), (i, el) => {
+  const e = $(el)
+    .text()
+    .split(':');
+  // parse through each item, e.g. make:toyota and store it
+  if (typeof e[1] !== 'undefined') {
+    carInfo[e[0].trim()] = e[1].trim();
   }
-);
+});
 const found = 'searching';
 
 // Go through and check to see if the condition that was set can match one on kbb
