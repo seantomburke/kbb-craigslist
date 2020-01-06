@@ -74,7 +74,7 @@
     "json-schema-traverse": "^0.4.1",
     "json-stable-stringify-without-jsonify": "^1.0.1",
     "levn": "^0.3.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.13",
     "mimic-fn": "^1.2.0",
     "minimatch": "^3.0.4",
     "minimist": "^0.0.8",
