@@ -13,7 +13,7 @@
   "version": "1.1.8",
   "main": "index.js",
   "dependencies": {
-    "acorn": "^6.0.4",
+    "acorn": "^6.4.1",
     "acorn-jsx": "^5.0.1",
     "ajv": "^6.5.5",
     "ansi-escapes": "^3.1.0",
